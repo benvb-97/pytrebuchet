@@ -1,0 +1,5 @@
+.vscode/*
+.venv/*
+.idea/*
+old/*
+*.py[cod]
