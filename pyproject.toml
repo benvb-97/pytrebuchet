@@ -36,6 +36,7 @@ dev = [
     "black>=25.9.0",
     "isort>=7.0.0",
     "ruff>=0.14.4",
+    "sphinx>=8.2.3",
 ]
 
 [tool.setuptools]
