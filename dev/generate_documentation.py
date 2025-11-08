@@ -14,6 +14,10 @@ if __name__ == "__main__":
     docs_folder_path = os.path.join(project_folder_path, "docs")
     os.chdir(docs_folder_path)
 
+    # Create _static and _templates folders under the docs folder if they don't exist
+    os.makedirs(os.path.join(docs_folder_path, "source", "_static"), exist_ok=True)
+    os.makedirs(os.path.join(docs_folder_path, "source", "_templates"), exist_ok=True)
+
     # Generate rst files from docstrings
     os.system("sphinx-apidoc -o source/ ../src/pytrebuchet")
     
