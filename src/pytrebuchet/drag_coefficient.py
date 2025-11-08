@@ -1,5 +1,6 @@
-import numpy as np
 import warnings
+
+import numpy as np
 
 
 def drag_coefficient_smooth_sphere_clift_grace_weber(
@@ -27,44 +28,64 @@ def drag_coefficient_smooth_sphere_clift_grace_weber(
 
     # Re <= 0.01
     idx = reynolds_number <= 1e-2
-    drag_coefficient[idx] = 9/2 + 24 / reynolds_number[idx]
+    drag_coefficient[idx] = 9 / 2 + 24 / reynolds_number[idx]
 
     # 0.01 < Re <= 20
     idx = (reynolds_number > 1e-2) & (reynolds_number <= 20)
-    drag_coefficient[idx] = 24 / reynolds_number[idx] * (1+0.1315 * np.float_power(reynolds_number[idx], 0.82-0.05*w[idx]))
+    drag_coefficient[idx] = (
+        24
+        / reynolds_number[idx]
+        * (1 + 0.1315 * np.float_power(reynolds_number[idx], 0.82 - 0.05 * w[idx]))
+    )
 
     # 20 < Re <= 260
     idx = (reynolds_number > 20) & (reynolds_number <= 260)
-    drag_coefficient[idx] = 24 / reynolds_number[idx] * (1 + 0.1935 * np.float_power(reynolds_number[idx], 0.6305))
+    drag_coefficient[idx] = (
+        24
+        / reynolds_number[idx]
+        * (1 + 0.1935 * np.float_power(reynolds_number[idx], 0.6305))
+    )
 
     # 260 < Re <= 1.5e3
     idx = (reynolds_number > 260) & (reynolds_number <= 1.5e3)
-    drag_coefficient[idx] = np.power(10, 1.6435 - 1.1242*w[idx] + 0.1558*np.square(w[idx]))
+    drag_coefficient[idx] = np.power(
+        10, 1.6435 - 1.1242 * w[idx] + 0.1558 * np.square(w[idx])
+    )
 
     # 1.5e3 < Re <= 1.2e4
     idx = (reynolds_number > 1.5e3) & (reynolds_number <= 1.2e4)
-    drag_coefficient[idx] = np.power(10, -2.4571 + 2.5558*w[idx] - 0.9295*np.square(w[idx]) + 0.1049*np.power(w[idx], 3))
+    drag_coefficient[idx] = np.power(
+        10,
+        -2.4571
+        + 2.5558 * w[idx]
+        - 0.9295 * np.square(w[idx])
+        + 0.1049 * np.power(w[idx], 3),
+    )
 
     # 1.2e4 < Re <= 4.4e4
     idx = (reynolds_number > 1.2e4) & (reynolds_number <= 4.4e4)
-    drag_coefficient[idx] = np.power(10, -1.9181 + 0.6370*w[idx] - 0.0636*np.square(w[idx]))
+    drag_coefficient[idx] = np.power(
+        10, -1.9181 + 0.6370 * w[idx] - 0.0636 * np.square(w[idx])
+    )
 
     # 4.4e4 < Re <= 3.38e5
     idx = (reynolds_number > 4.4e4) & (reynolds_number <= 3.38e5)
-    drag_coefficient[idx] = np.power(10, -4.3390 + 1.5809*w[idx] - 0.1546 * np.square(w[idx]))
+    drag_coefficient[idx] = np.power(
+        10, -4.3390 + 1.5809 * w[idx] - 0.1546 * np.square(w[idx])
+    )
 
     # 3.38e5 < Re <= 4e5
     idx = (reynolds_number > 3.38e5) & (reynolds_number <= 4e5)
-    drag_coefficient[idx] = 29.78 - 5.3*w[idx]
+    drag_coefficient[idx] = 29.78 - 5.3 * w[idx]
 
     # 4e5 < Re <= 1e6
     idx = (reynolds_number > 4e5) & (reynolds_number <= 1e6)
-    drag_coefficient[idx] = 0.1*w[idx] - 0.49
+    drag_coefficient[idx] = 0.1 * w[idx] - 0.49
 
     # Re > 1e6
     idx = reynolds_number > 1e6
     drag_coefficient[idx] = 0.19 - 8e4 / reynolds_number[idx]
-                                     
+
     # Cast to original format
     if is_float:
         assert drag_coefficient.size == 1

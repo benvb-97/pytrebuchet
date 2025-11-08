@@ -1,6 +1,10 @@
 from math import pi
 from typing import Callable
-from pytrebuchet.drag_coefficient import drag_coefficient_smooth_sphere_clift_grace_weber
+
+from pytrebuchet.drag_coefficient import (
+    drag_coefficient_smooth_sphere_clift_grace_weber,
+)
+
 
 class Projectile:
     """
