@@ -6,7 +6,5 @@ jobs:
     name: Ruff Linter
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: astral-sh/ruff-action@v3
-        with:
-          args: check .
-          src: "."
