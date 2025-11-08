@@ -45,10 +45,13 @@ def plot_initial_position(trebuchet: Trebuchet, projectile: Projectile) -> None:
     plt.show()
 
 
-def animate_launch(simulation: Simulation) -> None:
+def animate_launch(simulation: Simulation, skip: int = 5, delay: float = 25, show=True) -> None:
     """
     Animates the trebuchet launch and projectile motion using matplotlib.
     :param simulation: Simulation instance with completed run
+    :param skip: Number of frames to skip for faster animation
+    :param delay: Delay between frames in milliseconds
+    :param show: Whether to display the animation immediately
     :return: None
     """
 
@@ -61,10 +64,13 @@ def animate_launch(simulation: Simulation) -> None:
     fig, ax = plt.subplots()
 
     # Fetch time steps and angles
-    tsteps_trebuchet = simulation.tsteps_trebuchet
-    tsteps_projectile = simulation.tsteps_projectile
+    tsteps_trebuchet = simulation.tsteps_trebuchet[::skip]
+    tsteps_projectile = simulation.tsteps_projectile[::skip]
 
     angles_arm, angles_weight, angles_projectile = simulation.angles_trebuchet
+    angles_arm = angles_arm[::skip]
+    angles_weight = angles_weight[::skip]
+    angles_projectile = angles_projectile[::skip]
 
     # Calculate trebuchet points
     x_arm_weight, y_arm_weight = trebuchet.calculate_arm_endpoint_weight(angles_arm)
@@ -73,6 +79,8 @@ def animate_launch(simulation: Simulation) -> None:
 
     # Calculate projectile trajectory
     x_projectile, y_projectile = simulation.projectile_trajectory
+    x_projectile = x_projectile[::skip]
+    y_projectile = y_projectile[::skip]
 
     # Set figure limits
     ax.set_xlim(np.min(x_projectile)-1.0, np.max(x_projectile)+1.0)
@@ -91,6 +99,9 @@ def animate_launch(simulation: Simulation) -> None:
     ax.add_patch(circle_projectile)
     ax.add_patch(circle_weight)
 
+    # Create line plot for projectile trajectory
+    ax.plot(x_projectile, y_projectile, linestyle='--', color='gray', linewidth=0.5, label='Projectile Trajectory')
+
     def update(frame):
 
         if frame < tsteps_trebuchet.size:  # Animate both trebuchet and projectile
@@ -107,11 +118,15 @@ def animate_launch(simulation: Simulation) -> None:
 
         return line_arm_weight, line_arm_projectile, line_weight, line_projectile, circle_weight, circle_projectile
 
-    ani = animation.FuncAnimation(fig, update, frames=tsteps_projectile.size, blit=True, interval=10)
+    ani = animation.FuncAnimation(fig, update, frames=tsteps_projectile.size, blit=True, interval=delay)
 
     # Add labels and title
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_title("Trebuchet Animation")
+    ax.legend()
 
-    plt.show()
+    if show:
+        plt.show()
+
+    return ani
