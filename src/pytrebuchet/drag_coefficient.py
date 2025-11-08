@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 
 
 def drag_coefficient_smooth_sphere_clift_grace_weber(
@@ -83,14 +84,14 @@ def drag_coefficient_smooth_sphere_morrison(
     :return: drag coefficient of the sphere (dimensionless)
     """
 
-    # Correlation is valid for Reynolds numbers between 0.1 and 1e6
+    # Correlation is valid for Reynolds numbers between 0.1 and 1e6, consider 0.01 to 1e7 to be safe
     if isinstance(reynolds_number, float):
-        msg = f"Reynolds number {reynolds_number} out of range {0.1, 1e6}"
-        assert reynolds_number >= 0.1 and reynolds_number <= 1e6, msg
+        if not (reynolds_number >= 0.01 and reynolds_number <= 1e7):
+            warnings.warn(f"Reynolds number {reynolds_number} out of range {0.1, 1e7}")
     else:
         min_re, max_re = np.min(reynolds_number), np.max(reynolds_number)
-        msg = f"Reynolds number {min_re, max_re} out of range {0.1, 1e6}"
-        assert (min_re >= 0.1) & (max_re <= 1e6), msg
+        if (min_re < 0.01) | (max_re > 1e7):
+            warnings.warn(f"Reynolds number {min_re, max_re} out of range {0.1, 1e7}")
 
     # Calculate drag coefficient using the correlation
     drag_coefficient = (
