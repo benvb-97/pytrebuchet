@@ -32,7 +32,7 @@ class Projectile:
 
         self.effective_area = pi * (diameter / 2) ** 2  # cross-sectional area
 
-        if type(drag_coefficient) == float:  # constant drag coefficient
+        if type(drag_coefficient) is float:  # constant drag coefficient
             self.drag_coefficient = lambda reynolds: drag_coefficient
         elif drag_coefficient is None:  # default drag coefficient for smooth sphere
             self.drag_coefficient = _drag_coefficient_smooth_sphere

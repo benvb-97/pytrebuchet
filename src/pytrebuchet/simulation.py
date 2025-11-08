@@ -99,7 +99,8 @@ class Simulation:
         )
 
         # Define the event to stop the integration when the projectile separates from the ground
-        event = lambda t, y, *args: ground_separation_event(t, y, *args)
+        def event(t, y, *args):
+            return ground_separation_event(t, y, *args)
         event.terminal = True
         event.direction = 0
 
@@ -166,7 +167,8 @@ class Simulation:
         )
 
         # Define the event to stop the integration when the projectile is released from the sling
-        event = lambda t, y, *args: projectile_release_event(t, y, *args)
+        def event(t, y, *args):
+            return projectile_release_event(t, y, *args)
         event.terminal = True
         event.direction = 0
 
@@ -213,7 +215,8 @@ class Simulation:
         )
 
         # Define the event to stop the integration when the projectile hits the ground
-        event = lambda t, y, *args: projectile_hits_ground_event(t, y, *args)
+        def event(t, y, *args):
+            return projectile_hits_ground_event(t, y, *args)
         event.terminal = True
         event.direction = 0
 

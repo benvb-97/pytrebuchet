@@ -34,7 +34,7 @@ def plot_initial_position(trebuchet: Trebuchet, projectile: Projectile) -> None:
     )
 
     # Plot lines between trebuchet points
-    line_pivot = ax.plot([0.0, 0.0], [0.0, trebuchet.h_pivot], c="black")
+    ax.plot([0.0, 0.0], [0.0, trebuchet.h_pivot], c="black")  # pivot line
     (line_arm_projectile,) = ax.plot(
         [0.0, x_arm_projectile], [trebuchet.h_pivot, y_arm_projectile], c="red"
     )
@@ -112,7 +112,7 @@ def animate_launch(
     ax.set_ylim(-1.0, np.max(y_projectile) + 1.0)
 
     # Create line plot objects between trebuchet points
-    line_pivot = ax.plot([0.0, 0.0], [0.0, trebuchet.h_pivot], c="black")
+    ax.plot([0.0, 0.0], [0.0, trebuchet.h_pivot], c="black")  # pivot line
     (line_arm_projectile,) = ax.plot([], [], c="red")
     (line_arm_weight,) = ax.plot([], [], c="green")
     (line_weight,) = ax.plot([], [], c="blue")

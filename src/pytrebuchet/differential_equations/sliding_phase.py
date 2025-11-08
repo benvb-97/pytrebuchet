@@ -42,7 +42,7 @@ def sliding_projectile_ode(
     l1, l2, l3, l4, la, Ia, m1, m2, ma, g = args
 
     # Calculate terms
-    I = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
+    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
     I1 = m1 * l4**2
     I2 = m2 * l3**2
     I14 = m1 * l1 * l4
@@ -57,7 +57,7 @@ def sliding_projectile_ode(
     # Create Ax=B matrix
     A = np.array(
         [
-            [I, I14 * cos(theta - phi), -I23 * cos(theta - psi), -l2 * cos(theta)],
+            [I0, I14 * cos(theta - phi), -I23 * cos(theta - psi), -l2 * cos(theta)],
             [I14 * cos(theta - phi), I1, 0, 0],
             [-I23 * cos(theta - psi), 0, I2, l3 * cos(psi)],
             [-l2 * cos(theta), 0, l3 * cos(psi), 0],
@@ -121,7 +121,7 @@ def ground_separation_event(
     l1, l2, l3, l4, la, Ia, m1, m2, ma, g = args
 
     # Calculate terms
-    I = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
+    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
     I1 = m1 * l4**2
     I2 = m2 * l3**2
     I14 = m1 * l1 * l4
@@ -136,7 +136,7 @@ def ground_separation_event(
     # Create Ax=B matrix
     A = np.array(
         [
-            [I, I14 * cos(theta - phi), -I23 * cos(theta - psi), -l2 * cos(theta)],
+            [I0, I14 * cos(theta - phi), -I23 * cos(theta - psi), -l2 * cos(theta)],
             [I14 * cos(theta - phi), I1, 0, 0],
             [-I23 * cos(theta - psi), 0, I2, l3 * cos(psi)],
             [-l2 * cos(theta), 0, l3 * cos(psi), 0],

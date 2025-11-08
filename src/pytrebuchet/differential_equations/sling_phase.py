@@ -44,7 +44,7 @@ def sling_projectile_ode(
     l1, l2, l3, l4, la, Ia, m1, m2, ma, g, release_angle = args
 
     # Calculate terms
-    I = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
+    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
     I1 = m1 * l4**2
     I2 = m2 * l3**2
     I14 = m1 * l1 * l4
@@ -57,7 +57,7 @@ def sling_projectile_ode(
     # Create Ax=B matrix
     A = np.array(
         [
-            [I, I14 * cos(theta - phi), -I23 * cos(theta - psi)],
+            [I0, I14 * cos(theta - phi), -I23 * cos(theta - psi)],
             [I14 * cos(theta - phi), I1, 0],
             [-I23 * cos(theta - psi), 0, I2],
         ]
