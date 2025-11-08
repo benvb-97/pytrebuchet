@@ -1,4 +1,4 @@
-from pytrebuchet.trebuchet import Trebuchet
+from pytrebuchet import Trebuchet, Projectile, Simulation
 import numpy as np
 import pytest
 
@@ -86,4 +86,18 @@ class TestTrebuchet:
         assert x_w == pytest.approx(1.1860592698914765, abs=1e-12)
         assert y_w == pytest.approx(4.286764705882353, abs=1e-12)
 
+    def test_simulation(self):
+        trebuchet = init_trebuchet()
+        projectile = Projectile(mass=4.0, diameter=0.35)
+        simulation = Simulation(trebuchet, projectile,
+                                wind_speed=0.0,
+                                air_density=1.225,
+                                air_kinematic_viscosity=1.47e-5,
+                                gravitational_acceleration=9.81,)
 
+        simulation.solve()
+
+        assert simulation.ground_separation_time == pytest.approx(0.6753801120981405, abs=1e-6)
+        assert simulation.sling_release_time == pytest.approx(1.6496185045932605, abs=1e-6)
+        assert simulation.projectile_hits_ground_time == pytest.approx(5.998627164992915, abs=1e-6)
+        assert simulation.distance_traveled == pytest.approx(65.27682068472352, rel=1e-6)

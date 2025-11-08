@@ -60,7 +60,6 @@ class Simulation:
             self._solution_sliding_phase.y[2, :],
             self._solution_sling_phase.y[2, :],
         ))
-        self.distance_traveled = self._solution_free_flight_phase.y[0, -1]
         
     def _solve_ground_sliding_phase(self):
         """
@@ -152,7 +151,7 @@ class Simulation:
         event.direction = 0
         
         # Define the initial conditions from the end of the ground sliding phase
-        y0 = self._solution_sliding_phase.y[:, -1]
+        y0 = self._solution_sliding_phase.y_events[0][0, :]
 
         # Define the time span for the integration, and the time evaluation points
         t_span=(self.ground_separation_time, self.ground_separation_time + 5.0)
@@ -192,7 +191,7 @@ class Simulation:
         event.direction = 0
         
        # Define the initial conditions from the end of the sling phase
-        theta0, _, psi0, dtheta0, _, dpsi0 = self._solution_sling_phase.y[:, -1]
+        theta0, _, psi0, dtheta0, _, dpsi0 = self._solution_sling_phase.y_events[0][0, :]
         px0, py0 = self.trebuchet.calculate_projectile_point(angle_arm=theta0, angle_projectile=psi0)
 
         vx0 = self.trebuchet.l_projectile_arm * dtheta0 * np.sin(theta0) - self.trebuchet.l_sling_projectile * dpsi0 * np.sin(psi0)
@@ -213,64 +212,6 @@ class Simulation:
                             events=event,
                             )
 
-    def animate_trebuchet_and_projectile(self) -> None:
-        """
-        Animates the trebuchet and the projectile motion using matplotlib, over the full simulation time.
-        """
-        import matplotlib.pyplot as plt
-        import matplotlib.animation as animation
-
-        # Create figure with equal aspect ratio
-        fig, ax = plt.subplots()
-
-        # Add labels and title
-        ax.set_xlabel("X")
-        ax.set_ylabel("Y")
-        ax.set_title("Trebuchet Animation")
-
-        # Calculate trebuchet points
-        x_arm_weight, y_arm_weight, x_arm_projectile, y_arm_projectile, x_weight, y_weight, x_projectile, y_projectile \
-            = self.trebuchet.calculate_trebuchet_positions(
-            angle_arm=self.angle_arm,
-            angle_projectile=self.angle_projectile,
-            angle_weight=self.angle_weight,
-        )
-        x_projectile = np.concatenate((
-            x_projectile,
-            self._solution_free_flight_phase.y[0, :],
-        ))
-        y_projectile = np.concatenate((
-            y_projectile,
-            self._solution_free_flight_phase.y[1, :],
-        ))
-
-        # Set figure limits
-        ax.set_xlim(np.min(x_projectile)-1.0, np.max(x_projectile)+1.0)
-        ax.set_ylim(-1., np.max(y_projectile)+1.0)
-        
-        # Create line plot objects between trebuchet points
-        line_pivot = ax.plot([0.0, 0.0], [0.0, self.trebuchet.h_pivot], c="black")
-        line_arm_projectile, = ax.plot([], [], c="red")
-        line_arm_weight, = ax.plot([], [], c="green")
-        line_weight, = ax.plot([], [], c="blue")
-        line_projectile, = ax.plot([], [], c="orange") 
-
-        def update(frame):
-
-            if frame < self.tsteps_trebuchet.size:
-                line_arm_projectile.set_data([0.0, x_arm_projectile[frame]], [self.trebuchet.h_pivot, y_arm_projectile[frame]])
-                line_arm_weight.set_data([0.0, x_arm_weight[frame]], [self.trebuchet.h_pivot, y_arm_weight[frame]])
-                line_weight.set_data([x_arm_weight[frame], x_weight[frame]], [y_arm_weight[frame], y_weight[frame]])
-                line_projectile.set_data([x_arm_projectile[frame], x_projectile[frame]], [y_arm_projectile[frame], y_projectile[frame]])
-            else:
-                line_projectile.set_data([x_arm_projectile[self.tsteps_trebuchet.size-1], x_projectile[frame]], [y_arm_projectile[self.tsteps_trebuchet.size-1], y_projectile[frame]])
-
-            return line_arm_weight, line_arm_projectile, line_weight, line_projectile
-
-        ani = animation.FuncAnimation(fig, update, frames=self.tsteps_projectile.size, blit=True, interval=10)
-
-        plt.show()
-
     @property
     def solved(self) -> bool:
         """
@@ -282,35 +223,46 @@ class Simulation:
                 self._solution_free_flight_phase is not None)
     
     @property
-    def ground_separation_time(self) -> float | None:
+    def ground_separation_time(self) -> float:
         """
         Returns the time when the projectile separates from the ground, marking the end of the ground sliding phase.
-        :return: Time when the projectile separates from the ground, or None if the simulation has not been run.
+        :return: Time when the projectile separates from the ground.
         """
         if self._solution_sliding_phase is None:
             raise ValueError("Simulation has not been run yet.")
         return self._solution_sliding_phase.t_events[0][0]
 
     @property
-    def sling_release_time(self) -> float | None:
+    def sling_release_time(self) -> float:
         """
         Returns the time when the projectile is released from the sling, marking the end of the sling phase.
-        :return: Time when the projectile is released from the sling, or None if the simulation has not been run.
+        :return: Time when the projectile is released from the sling.
         """
         if self._solution_sling_phase is None:
             raise ValueError("Simulation has not been run yet.")
         return self._solution_sling_phase.t_events[0][0]
     
     @property
-    def projectile_hits_ground_time(self) -> float | None:
+    def projectile_hits_ground_time(self) -> float:
         """
         Returns the time when the projectile hits the ground, marking the end of the free flight phase.
-        :return: Time when the projectile hits the ground, or None if the simulation has not been run.
+        :return: Time when the projectile hits the ground.
         """
         if self._solution_free_flight_phase is None:
             raise ValueError("Simulation has not been run yet.")
         return self._solution_free_flight_phase.t_events[0][0]
     
+    @property
+    def distance_traveled(self) -> float:
+        """
+        Returns the horizontal distance traveled by the projectile as measured from the pivot's x-coordinate.
+        :return: Horizontal distance traveled by the projectile.
+        """
+        if self._solution_free_flight_phase is None:
+            raise ValueError("Simulation has not been run yet.")
+    
+        return self._solution_free_flight_phase.y_events[0][0, 0]
+
     @property
     def tsteps_trebuchet(self) -> np.ndarray[float] | None:
         """
@@ -341,3 +293,50 @@ class Simulation:
             self._solution_free_flight_phase.t,
         ))
         return tsteps
+    
+    @property
+    def angles_trebuchet(self) -> tuple[np.ndarray[float], np.ndarray[float], np.ndarray[float]] | None:
+        """
+        Returns the angles of the trebuchet components (arm, weight, projectile) concatenated into single arrays.
+        :return: Tuple of numpy arrays containing the angles of the arm, weight, and projectile, or None if the simulation has not been run.
+        """
+        if not self.solved:
+            raise ValueError("Simulation has not been run yet.")
+        
+        variables = np.concatenate((
+            self._solution_sliding_phase.y.T,
+            self._solution_sliding_phase.y_events[0],
+            self._solution_sling_phase.y.T,
+            self._solution_sling_phase.y_events[0],
+        ), axis=0)
+
+        angles_arm, angles_weight, angles_projectile = variables[:, 0], variables[:, 1], variables[:, 2]
+        return angles_arm, angles_weight, angles_projectile
+    
+    @property
+    def projectile_trajectory(self) -> tuple[np.ndarray[float], np.ndarray[float]]:
+        """
+        Returns the x and y positions of the projectile throughout its flight.
+        :return: Tuple of numpy arrays containing the x and y positions of the projectile.
+        """
+        if not self.solved:
+            raise ValueError("Simulation has not been run yet.")
+
+        # Calculate projectile positions during trebuchet phases
+        angles_arm, angles_weight, angles_projectile = self.angles_trebuchet
+        x_projectile, y_projectile = self.trebuchet.calculate_projectile_point(
+            angle_arm=angles_arm, angle_projectile=angles_projectile)
+
+        # Concatenate with projectile positions during free flight phase
+        x_projectile = np.concatenate((
+            x_projectile,
+            self._solution_free_flight_phase.y[0, :].T,
+            self._solution_free_flight_phase.y_events[0][:, 0],
+        ))
+        y_projectile = np.concatenate((
+            y_projectile,
+            self._solution_free_flight_phase.y[1, :].T,
+            self._solution_free_flight_phase.y_events[0][:, 1],
+        ))
+
+        return x_projectile, y_projectile

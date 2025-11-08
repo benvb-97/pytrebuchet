@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 import warnings
 
 
@@ -209,7 +207,7 @@ class Trebuchet:
         return x_projectile, y_projectile
     
     # Plotting functions
-    def _get_limits(self) -> tuple[tuple[float, float], tuple[float, float]]:
+    def get_limits(self) -> tuple[tuple[float, float], tuple[float, float]]:
         """
         Returns the maximum x- and y- positions that the points making up the trebuchet can take for plotting.
         :return: (x_min, x_max), (y_min, y_max)
@@ -224,37 +222,6 @@ class Trebuchet:
         y_min = 0.0
         y_max = self.h_pivot + max_length
         return (x_min, x_max), (y_min, y_max)
-
-    def plot_initial_position(self) -> None:
-        """
-        Plots the initial position of the trebuchet.
-        """
-
-        # Create figure
-        fig, ax = plt.subplots()
-        limits_x, limits_y = self._get_limits()
-        ax.set_xlim(limits_x[0], limits_x[1])
-        ax.set_ylim(limits_y[0], limits_y[1])
-
-        # Calculate trebuchet points
-        x_arm_weight, y_arm_weight = self.calculate_arm_endpoint_weight(self.init_angle_arm)
-        x_arm_projectile, y_arm_projectile = self.calculate_arm_endpoint_projectile(self.init_angle_arm)
-        x_weight, y_weight = self.calculate_weight_point(self.init_angle_arm, self.init_angle_weight)
-        x_projectile, y_projectile = self.calculate_projectile_point(self.init_angle_arm, self.init_angle_projectile)
-        
-        # Plot lines between trebuchet points
-        line_pivot = ax.plot([0.0, 0.0], [0.0, self.h_pivot], c="black")
-        line_arm_projectile, = ax.plot([0.0, x_arm_projectile], [self.h_pivot, y_arm_projectile], c="red")
-        line_arm_weight, = ax.plot([0.0, x_arm_weight], [self.h_pivot, y_arm_weight], c="green")
-        line_weight, = ax.plot([x_arm_weight, x_weight], [y_arm_weight, y_weight], c="blue")
-        line_projectile, = ax.plot([x_arm_projectile, x_projectile], [y_arm_projectile, y_projectile], c="orange")   
-
-        # Add labels and title
-        ax.set_xlabel("X")
-        ax.set_ylabel("Y")
-        ax.set_title("Trebuchet Initial Position")
-
-        plt.show()
 
     def animate_trebuchet(self,
                           tsteps: np.ndarray[float],
