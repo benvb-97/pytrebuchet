@@ -1,9 +1,11 @@
 import numpy as np
-from numpy import sin, cos
+from numpy import cos, sin
 
 
 def sliding_projectile_ode(
-        t, y, *args,
+    t,
+    y,
+    *args,
 ):
     """
     Represents the ordinary differential equations (ODEs) for a trebuchet with a projectile sliding over the ground.
@@ -34,35 +36,43 @@ def sliding_projectile_ode(
     """
 
     # Fetch variables
-    theta, phi, psi, dtheta, dphi, dpsi = y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
+    theta, phi, psi, dtheta, dphi, dpsi = (
+        y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
+    )
     l1, l2, l3, l4, la, Ia, m1, m2, ma, g = args
 
     # Calculate terms
-    I = m1*l1**2 + m2*l2**2 + ma*la**2 + Ia
-    I1 = m1*l4**2
-    I2 = m2*l3**2
-    I14 = m1*l1*l4
-    I23 = m2*l2*l3
+    I = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
+    I1 = m1 * l4**2
+    I2 = m2 * l3**2
+    I14 = m1 * l1 * l4
+    I23 = m2 * l2 * l3
 
-    M = m1*l1 - m2*l2 - ma*la
-    M14 = m1*l4
-    M23 = m2*l3
+    M = m1 * l1 - m2 * l2 - ma * la
+    M14 = m1 * l4
+    M23 = m2 * l3
 
-    gamma = -l2 * dtheta**2*sin(theta) + l3*dpsi**2*sin(psi)
+    gamma = -l2 * dtheta**2 * sin(theta) + l3 * dpsi**2 * sin(psi)
 
     # Create Ax=B matrix
-    A = np.array([
-        [I, I14*cos(theta-phi), -I23*cos(theta-psi), -l2*cos(theta)],
-        [I14*cos(theta-phi), I1, 0, 0],
-        [-I23*cos(theta-psi), 0, I2, l3 * cos(psi)],
-        [-l2*cos(theta), 0, l3 * cos(psi), 0],
-    ])
-    B = np.array([
-        -I14*dphi**2*sin(theta-phi) + I23*dpsi**2*sin(theta-psi) - M*g*cos(theta),
-        I14*dtheta**2*sin(theta-phi) - M14*g*cos(phi),
-        -I23*dtheta**2*sin(theta-psi) - M23*g*cos(psi),
-        gamma
-    ])
+    A = np.array(
+        [
+            [I, I14 * cos(theta - phi), -I23 * cos(theta - psi), -l2 * cos(theta)],
+            [I14 * cos(theta - phi), I1, 0, 0],
+            [-I23 * cos(theta - psi), 0, I2, l3 * cos(psi)],
+            [-l2 * cos(theta), 0, l3 * cos(psi), 0],
+        ]
+    )
+    B = np.array(
+        [
+            -I14 * dphi**2 * sin(theta - phi)
+            + I23 * dpsi**2 * sin(theta - psi)
+            - M * g * cos(theta),
+            I14 * dtheta**2 * sin(theta - phi) - M14 * g * cos(phi),
+            -I23 * dtheta**2 * sin(theta - psi) - M23 * g * cos(psi),
+            gamma,
+        ]
+    )
 
     ddtheta, ddphi, ddpsi, _ = np.linalg.solve(A, B)
 
@@ -70,7 +80,9 @@ def sliding_projectile_ode(
 
 
 def ground_separation_event(
-        t, y, *args,
+    t,
+    y,
+    *args,
 ):
     """
     Calculates the lagrange multiplier for the ground separation event in a trebuchet with a sliding projectile.
@@ -103,37 +115,44 @@ def ground_separation_event(
     """
 
     # Fetch variables
-    theta, phi, psi, dtheta, dphi, dpsi = y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
+    theta, phi, psi, dtheta, dphi, dpsi = (
+        y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
+    )
     l1, l2, l3, l4, la, Ia, m1, m2, ma, g = args
 
     # Calculate terms
-    I = m1*l1**2 + m2*l2**2 + ma*la**2 + Ia
-    I1 = m1*l4**2
-    I2 = m2*l3**2
-    I14 = m1*l1*l4
-    I23 = m2*l2*l3
+    I = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
+    I1 = m1 * l4**2
+    I2 = m2 * l3**2
+    I14 = m1 * l1 * l4
+    I23 = m2 * l2 * l3
 
-    M = m1*l1 - m2*l2 - ma*la
-    M14 = m1*l4
-    M23 = m2*l3
+    M = m1 * l1 - m2 * l2 - ma * la
+    M14 = m1 * l4
+    M23 = m2 * l3
 
-    gamma = -l2 * dtheta**2*sin(theta) + l3*dpsi**2*sin(psi)
+    gamma = -l2 * dtheta**2 * sin(theta) + l3 * dpsi**2 * sin(psi)
 
     # Create Ax=B matrix
-    A = np.array([
-        [I, I14*cos(theta-phi), -I23*cos(theta-psi), -l2*cos(theta)],
-        [I14*cos(theta-phi), I1, 0, 0],
-        [-I23*cos(theta-psi), 0, I2, l3 * cos(psi)],
-        [-l2*cos(theta), 0, l3 * cos(psi), 0],
-    ])
-    B = np.array([
-        -I14*dphi**2*sin(theta-phi) + I23*dpsi**2*sin(theta-psi) - M*g*cos(theta),
-        I14*dtheta**2*sin(theta-phi) - M14*g*cos(phi),
-        -I23*dtheta**2*sin(theta-psi) - M23*g*cos(psi),
-        gamma
-    ])
+    A = np.array(
+        [
+            [I, I14 * cos(theta - phi), -I23 * cos(theta - psi), -l2 * cos(theta)],
+            [I14 * cos(theta - phi), I1, 0, 0],
+            [-I23 * cos(theta - psi), 0, I2, l3 * cos(psi)],
+            [-l2 * cos(theta), 0, l3 * cos(psi), 0],
+        ]
+    )
+    B = np.array(
+        [
+            -I14 * dphi**2 * sin(theta - phi)
+            + I23 * dpsi**2 * sin(theta - psi)
+            - M * g * cos(theta),
+            I14 * dtheta**2 * sin(theta - phi) - M14 * g * cos(phi),
+            -I23 * dtheta**2 * sin(theta - psi) - M23 * g * cos(psi),
+            gamma,
+        ]
+    )
 
     ddtheta, ddphi, ddpsi, lambd = np.linalg.solve(A, B)
 
     return lambd
-

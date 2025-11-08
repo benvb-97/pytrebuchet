@@ -1,9 +1,11 @@
 import numpy as np
-from numpy import sin, cos
+from numpy import cos, sin
 
 
 def sling_projectile_ode(
-        t, y, *args,
+    t,
+    y,
+    *args,
 ):
     """
     Represents the ordinary differential equations (ODEs) for a trebuchet with a projectile that is unconstrained by the ground, but still in the sling.
@@ -36,31 +38,39 @@ def sling_projectile_ode(
     """
 
     # Fetch variables
-    theta, phi, psi, dtheta, dphi, dpsi = y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
+    theta, phi, psi, dtheta, dphi, dpsi = (
+        y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
+    )
     l1, l2, l3, l4, la, Ia, m1, m2, ma, g, release_angle = args
 
     # Calculate terms
-    I = m1*l1**2 + m2*l2**2 + ma*la**2 + Ia
-    I1 = m1*l4**2
-    I2 = m2*l3**2
-    I14 = m1*l1*l4
-    I23 = m2*l2*l3
+    I = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
+    I1 = m1 * l4**2
+    I2 = m2 * l3**2
+    I14 = m1 * l1 * l4
+    I23 = m2 * l2 * l3
 
-    M = m1*l1 - m2*l2 - ma*la
-    M14 = m1*l4
-    M23 = m2*l3
+    M = m1 * l1 - m2 * l2 - ma * la
+    M14 = m1 * l4
+    M23 = m2 * l3
 
     # Create Ax=B matrix
-    A = np.array([
-        [I, I14*cos(theta-phi), -I23*cos(theta-psi)],
-        [I14*cos(theta-phi), I1, 0],
-        [-I23*cos(theta-psi), 0, I2],
-    ])
-    B = np.array([
-        -I14*dphi**2*sin(theta-phi) + I23*dpsi**2*sin(theta-psi) - M*g*cos(theta),
-        I14*dtheta**2*sin(theta-phi) - M14*g*cos(phi),
-        -I23*dtheta**2*sin(theta-psi) - M23*g*cos(psi),
-    ])
+    A = np.array(
+        [
+            [I, I14 * cos(theta - phi), -I23 * cos(theta - psi)],
+            [I14 * cos(theta - phi), I1, 0],
+            [-I23 * cos(theta - psi), 0, I2],
+        ]
+    )
+    B = np.array(
+        [
+            -I14 * dphi**2 * sin(theta - phi)
+            + I23 * dpsi**2 * sin(theta - psi)
+            - M * g * cos(theta),
+            I14 * dtheta**2 * sin(theta - phi) - M14 * g * cos(phi),
+            -I23 * dtheta**2 * sin(theta - psi) - M23 * g * cos(psi),
+        ]
+    )
 
     ddtheta, ddphi, ddpsi = np.linalg.solve(A, B)
 
@@ -68,7 +78,9 @@ def sling_projectile_ode(
 
 
 def projectile_release_event(
-        t, y, *args,
+    t,
+    y,
+    *args,
 ):
     """
     Event function to determine when the projectile releases from the sling (when the velocity angle matches the desired release angle).
@@ -101,7 +113,9 @@ def projectile_release_event(
     """
 
     # Fetch variables
-    theta, phi, psi, dtheta, dphi, dpsi = y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
+    theta, phi, psi, dtheta, dphi, dpsi = (
+        y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
+    )
     l1, l2, l3, l4, la, Ia, m1, m2, ma, g, release_angle = args
 
     # Calculate velocity of the projectile
@@ -114,4 +128,3 @@ def projectile_release_event(
     if vx < 0:  # projectile is moving backwards, avoid false release
         return 1.0
     return velocity_angle - release_angle
-
