@@ -14,4 +14,4 @@ python -m pip install pytrebuchet
 
 ## License
 
-See LICENSE file for details.
+Pytrebuchet is provided under an MIT license that can be found in the LICENSE file.
