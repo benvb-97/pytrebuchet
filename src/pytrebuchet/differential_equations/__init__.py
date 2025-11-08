@@ -11,7 +11,6 @@ from pytrebuchet.differential_equations.sling_phase import (
     sling_projectile_ode,
 )
 
-
 __all__ = [
     "free_flight_ode",
     "projectile_hits_ground_event",
