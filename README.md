@@ -6,6 +6,8 @@ A Python-based trebuchet simulation project.
 
 Pytrebuchet is a physics simulation tool for modeling and analyzing trebuchet mechanics.
 
+The differential equations governing the trebuchet's motion were derived using Langrangian mechanics by E. Constans and A. Constans. They published their equations on [http://www.benchtophybrid.com/TB/TB_Literature.html](http://www.benchtophybrid.com/TB/TB_Literature.html). The code uses scipy's solve_ivp function to solve the system of ODEs.
+
 ## Installation
 
 ```bash
