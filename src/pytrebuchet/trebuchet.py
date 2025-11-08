@@ -206,6 +206,28 @@ class Trebuchet:
         
         return x_projectile, y_projectile
     
+    def calculate_projectile_velocity(self,
+                                      angle_arm: float | np.ndarray[float],
+                                      angle_projectile: float | np.ndarray[float],
+                                      angular_velocity_arm: float | np.ndarray[float],
+                                      angular_velocity_projectile: float | np.ndarray[float],
+                                      ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
+        """
+        Calculates the x, y components of the projectile velocity based on the given arm and projectile angles and angular velocities.
+        :param angle_arm: angle of the arm (radians)
+        :param angle_projectile: angle of the projectile (radians)
+        :param angular_velocity_arm: angular velocity of the arm (radians/s)
+        :param angular_velocity_projectile: angular velocity of the projectile sling (radians/s)
+        :return: x, y components of the projectile velocity
+        """
+
+        vx = self.l_projectile_arm * angular_velocity_arm * np.sin(angle_arm) \
+        - self.l_sling_projectile * angular_velocity_projectile * np.sin(angle_projectile)
+        
+        vy = -self.l_projectile_arm * angular_velocity_arm * np.cos(angle_arm) \
+        + self.l_sling_projectile * angular_velocity_projectile * np.cos(angle_projectile)
+
+        return vx, vy
     # Plotting functions
     def get_limits(self) -> tuple[tuple[float, float], tuple[float, float]]:
         """
@@ -222,53 +244,3 @@ class Trebuchet:
         y_min = 0.0
         y_max = self.h_pivot + max_length
         return (x_min, x_max), (y_min, y_max)
-
-    def animate_trebuchet(self,
-                          tsteps: np.ndarray[float],
-                          angle_arm: np.ndarray[float],
-                          angle_projectile: np.ndarray[float],
-                          angle_weight: np.ndarray[float],
-                          ) -> None:
-        """
-        Animates the trebuchet based on the given angles over time.
-        """
-        assert tsteps.size == angle_arm.size == angle_projectile.size == angle_weight.size, "Input arrays must have the same length."
-
-        # Create figure with equal aspect ratio
-        fig, ax = plt.subplots()
-
-        # Add labels and title
-        ax.set_xlabel("X")
-        ax.set_ylabel("Y")
-        ax.set_title("Trebuchet Animation")
-
-        # Set figure limits
-        limits_x, limits_y = self._get_limits()
-        ax.set_xlim(limits_x[0]-1, limits_x[1]+1)
-        ax.set_ylim(limits_y[0]-1, limits_y[1]+1)
-        ax.grid()
-
-        # Calculate trebuchet points
-        x_arm_weight, y_arm_weight, x_arm_projectile, y_arm_projectile, x_weight, y_weight, x_projectile, y_projectile = self.calculate_trebuchet_positions(
-            angle_arm=angle_arm,
-            angle_projectile=angle_projectile,
-            angle_weight=angle_weight,
-        )
-        
-        # Create line plot objects between trebuchet points
-        line_pivot = ax.plot([0.0, 0.0], [0.0, self.h_pivot], c="black")
-        line_arm_projectile, = ax.plot([], [], c="red")
-        line_arm_weight, = ax.plot([], [], c="green")
-        line_weight, = ax.plot([], [], c="blue")
-        line_projectile, = ax.plot([], [], c="orange") 
-
-        def update(frame):
-            line_arm_projectile.set_data([0.0, x_arm_projectile[frame]], [self.h_pivot, y_arm_projectile[frame]])
-            line_arm_weight.set_data([0.0, x_arm_weight[frame]], [self.h_pivot, y_arm_weight[frame]])
-            line_weight.set_data([x_arm_weight[frame], x_weight[frame]], [y_arm_weight[frame], y_weight[frame]])
-            line_projectile.set_data([x_arm_projectile[frame], x_projectile[frame]], [y_arm_projectile[frame], y_projectile[frame]])
-            return line_arm_weight, line_arm_projectile, line_weight, line_projectile
-
-        ani = animation.FuncAnimation(fig, update, frames=tsteps.size, blit=True, interval=50) 
-
-        plt.show()
