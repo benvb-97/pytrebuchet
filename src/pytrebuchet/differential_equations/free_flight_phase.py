@@ -1,9 +1,12 @@
 import numpy as np
+
 from pytrebuchet.projectile import Projectile
 
 
 def free_flight_ode(
-        t, y, *args,
+    t,
+    y,
+    *args,
 ):
     """
     Represents the ordinary differential equations (ODEs) for a projectile in free flight after release from the sling.
@@ -35,20 +38,32 @@ def free_flight_ode(
     _, _, vx, vy = y
 
     # Calculate drag coefficient
-    reynolds = calculate_reynolds_number(velocity=np.sqrt(vx**2 + vy**2), 
-                                                diameter=np.sqrt(4*eff_area/np.pi), 
-                                                air_kinematic_viscosity=nu)
+    reynolds = calculate_reynolds_number(
+        velocity=np.sqrt(vx**2 + vy**2),
+        diameter=np.sqrt(4 * eff_area / np.pi),
+        air_kinematic_viscosity=nu,
+    )
     drag_coeff = projectile.drag_coefficient(reynolds)
 
     # Calculate accelerations
-    ax = -(rho*drag_coeff*eff_area*(vx-wind_speed)*np.sqrt(vy**2+(wind_speed-vx)**2))/(2*mass_p)
-    ay = -g - (rho*drag_coeff*eff_area*vy*np.sqrt(vy**2+(wind_speed-vx)**2))/(2*mass_p)
+    ax = -(
+        rho
+        * drag_coeff
+        * eff_area
+        * (vx - wind_speed)
+        * np.sqrt(vy**2 + (wind_speed - vx) ** 2)
+    ) / (2 * mass_p)
+    ay = -g - (
+        rho * drag_coeff * eff_area * vy * np.sqrt(vy**2 + (wind_speed - vx) ** 2)
+    ) / (2 * mass_p)
 
     return vx, vy, ax, ay
 
 
 def projectile_hits_ground_event(
-        t, y, *args,
+    t,
+    y,
+    *args,
 ):
     """
     Represents the event function to determine when the projectile hits the ground.
@@ -77,9 +92,9 @@ def projectile_hits_ground_event(
 
 
 def calculate_reynolds_number(
-        velocity: float,
-        diameter: float,
-        air_kinematic_viscosity: float,
+    velocity: float,
+    diameter: float,
+    air_kinematic_viscosity: float,
 ) -> float:
     """
     Calculates the Reynolds number for a (spherical) projectile.

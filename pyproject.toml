@@ -35,6 +35,7 @@ dev = [
     "pytest>=8.4.2",
     "black>=25.9.0",
     "isort>=7.0.0",
+    "ruff>=0.14.4",
 ]
 
 [tool.setuptools]
