@@ -8,6 +8,7 @@ def drag_coefficient_smooth_sphere_clift_grace_weber(
 ) -> float | np.ndarray[float]:
     """
     Calculates the drag coefficient for a smooth sphere based on the Reynolds number.
+    
     Source: Clift, Grace, and Weber (Bubbles, Drops, and Particles, Academic Press, 1978)
 
     :param reynolds_number: Reynolds number of the sphere
@@ -98,8 +99,9 @@ def drag_coefficient_smooth_sphere_morrison(
 ) -> float | np.ndarray[float]:
     """
     Calculates the drag coefficient for a smooth sphere based on the Reynolds number.
+    
     Source: Data Correlation for Drag Coefficient for Sphere Faith A. Morrison,
-            Department of Chemical Engineering Michigan Technological University, Houghton, MI 49931
+    Department of Chemical Engineering Michigan Technological University, Houghton, MI 49931
 
     :param reynolds_number: Reynolds number of the sphere
     :return: drag coefficient of the sphere (dimensionless)
