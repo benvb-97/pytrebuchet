@@ -12,21 +12,24 @@ def free_flight_ode(
     Represents the ordinary differential equations (ODEs) for a projectile in free flight after release from the sling.
 
     :param t: time variable (not used in this function but required for ODE solvers)
+    
     :param y: tuple containing the state variables:
-              (px, py, vx, vy)
-              where:
-              px: x position of the projectile
-              py: y position of the projectile
-              vx: x velocity of the projectile
-              vy: y velocity of the projectile
+        (px, py, vx, vy)
+        where:
+        px: x position of the projectile
+        py: y position of the projectile
+        vx: x velocity of the projectile
+        vy: y velocity of the projectile
+
     :param args: additional parameters required for the equations:
-                 (wind_speed, rho, nu, g, projectile)
-                 where:
-                    wind_speed: wind speed
-                    rho: air density
-                    nu: kinematic viscosity of the air
-                    g: gravitational acceleration
-                    projectile: Projectile object containing properties of the projectile
+        (wind_speed, rho, nu, g, projectile)
+        where:
+        wind_speed: wind speed
+        rho: air density
+        nu: kinematic viscosity of the air
+        g: gravitational acceleration
+        projectile: Projectile object containing properties of the projectile
+
     :return: derivatives: tuple containing the derivatives of the state variables:
              (vx, vy, ax, ay)
     """
@@ -70,21 +73,24 @@ def projectile_hits_ground_event(
     The event occurs when the vertical position of the projectile (py) reaches zero.
 
     :param t: time variable (not used in this function but required for ODE solvers)
+
     :param y: tuple containing the state variables:
-              (px, py, vx, vy)
-              where:
-              px: x position of the projectile
-              py: y position of the projectile
-              vx: x velocity of the projectile
-              vy: y velocity of the projectile
+        (px, py, vx, vy)
+        where:
+        px: x position of the projectile
+        py: y position of the projectile
+        vx: x velocity of the projectile
+        vy: y velocity of the projectile
+
     :param args: additional parameters required for the equations:
-                 (wind_speed, rho, nu, g, projectile)
-                 where:
-                    wind_speed: wind speed
-                    rho: air density
-                    nu: kinematic viscosity of the air
-                    g: gravitational acceleration
-                    projectile: Projectile object containing properties of the projectile
+        (wind_speed, rho, nu, g, projectile)
+        where:
+        wind_speed: wind speed
+        rho: air density
+        nu: kinematic viscosity of the air
+        g: gravitational acceleration
+        projectile: Projectile object containing properties of the projectile
+
     :return: py: vertical position of the projectile
     """
     _, py, _, _ = y

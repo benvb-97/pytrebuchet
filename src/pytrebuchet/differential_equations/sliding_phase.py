@@ -10,28 +10,31 @@ def sliding_projectile_ode(
     """
     Represents the ordinary differential equations (ODEs) for a trebuchet with a projectile sliding over the ground.
     :param t: time variable (not used in this function but required for ODE solvers)
+
     :param y: tuple containing the state variables:
-              (theta, phi, psi, dtheta, dphi, dpsi)
-              where:
-              theta: angle of the arm
-              phi: angle of the weight
-              psi: angle of the projectile
-              dtheta: angular velocity of the arm
-              dphi: angular velocity of the weight
-              dpsi: angular velocity of the projectile
+        (theta, phi, psi, dtheta, dphi, dpsi)
+        where:
+        theta: angle of the arm
+        phi: angle of the weight
+        psi: angle of the projectile
+        dtheta: angular velocity of the arm
+        dphi: angular velocity of the weight
+        dpsi: angular velocity of the projectile
+
     :param args: additional parameters required for the equations:
-                 (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
-                 where:
-                 l1: length of the arm from pivot to weight attachment point
-                 l2: length of the arm from pivot to projectile attachment point
-                 l3: length of the sling to which the projectile is attached
-                 l4: length of the sling to which the weight is attached
-                 la: distance from the pivot to the arm's center of gravity
-                 Ia: inertia of the arm
-                 m1: mass of the weight
-                 m2: mass of the projectile
-                 ma: mass of the arm
-                 g: gravitational acceleration
+        (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
+        where:
+        l1: length of the arm from pivot to weight attachment point
+        l2: length of the arm from pivot to projectile attachment point
+        l3: length of the sling to which the projectile is attached
+        l4: length of the sling to which the weight is attached
+        la: distance from the pivot to the arm's center of gravity
+        Ia: inertia of the arm
+        m1: mass of the weight
+        m2: mass of the projectile
+        ma: mass of the arm
+        g: gravitational acceleration
+
     :return: derivatives: tuple containing the derivatives of the state variables: (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
 
@@ -89,28 +92,31 @@ def ground_separation_event(
     When the lagrange multiplier becomes zero, the projectile separates from the ground.
 
     :param t: time variable (not used in this function but required for ODE solvers)
+
     :param y: tuple containing the state variables:
-              (theta, phi, psi, dtheta, dphi, dpsi)
-              where:
-              theta: angle of the arm
-              phi: angle of the weight
-              psi: angle of the projectile
-              dtheta: angular velocity of the arm
-              dphi: angular velocity of the weight
-              dpsi: angular velocity of the projectile
+        (theta, phi, psi, dtheta, dphi, dpsi)
+        where:
+        theta: angle of the arm
+        phi: angle of the weight
+        psi: angle of the projectile
+        dtheta: angular velocity of the arm
+        dphi: angular velocity of the weight
+        dpsi: angular velocity of the projectile
+
     :param args: additional parameters required for the equations:
-                 (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
-                 where:
-                 l1: length of the arm from pivot to weight attachment point
-                 l2: length of the arm from pivot to projectile attachment point
-                 l3: length of the sling to which the projectile is attached
-                 l4: length of the sling to which the weight is attached
-                 la: distance from the pivot to the arm's center of gravity
-                 Ia: inertia of the arm
-                 m1: mass of the weight
-                 m2: mass of the projectile
-                 ma: mass of the arm
-                 g: gravitational acceleration
+        (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
+        where:
+        l1: length of the arm from pivot to weight attachment point
+        l2: length of the arm from pivot to projectile attachment point
+        l3: length of the sling to which the projectile is attached
+        l4: length of the sling to which the weight is attached
+        la: distance from the pivot to the arm's center of gravity
+        Ia: inertia of the arm
+        m1: mass of the weight
+        m2: mass of the projectile
+        ma: mass of the arm
+        g: gravitational acceleration
+    
     :return: lambd: the lagrange multiplier, representing the normal force at the ground contact point
     """
 
