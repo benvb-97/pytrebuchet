@@ -9,7 +9,7 @@ Pytrebuchet is a physics simulation tool for modeling and analyzing trebuchet me
 ## Installation
 
 ```bash
-pip install -r requirements.txt
+python -m pip install pytrebuchet
 ```
 
 ## License
