@@ -1,6 +1,6 @@
 from math import pi
 from typing import Callable
-from pytrebuchet.drag_coefficient import drag_coefficient_smooth_sphere_morrison
+from pytrebuchet.drag_coefficient import drag_coefficient_smooth_sphere_clift_grace_weber
 
 class Projectile:
     """
@@ -33,7 +33,7 @@ class Projectile:
         if type(drag_coefficient) is float:  # constant drag coefficient
             self.drag_coefficient = lambda reynolds: drag_coefficient
         elif drag_coefficient is None:  # default drag coefficient for smooth sphere
-            self.drag_coefficient = drag_coefficient_smooth_sphere_morrison
+            self.drag_coefficient = drag_coefficient_smooth_sphere_clift_grace_weber
         else:
             self.drag_coefficient = drag_coefficient
 

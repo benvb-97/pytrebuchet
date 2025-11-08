@@ -110,8 +110,8 @@ class TestTrebuchet:
             1.6496185045932605, abs=1e-6
         )
         assert simulation.projectile_hits_ground_time == pytest.approx(
-            5.998627164992915, abs=1e-6
+            6.001154582225362, abs=1e-6
         )
         assert simulation.distance_traveled == pytest.approx(
-            65.27682068472352, rel=1e-6
+            65.78320316489973, rel=1e-6
         )
