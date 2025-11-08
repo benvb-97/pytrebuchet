@@ -1,0 +1,28 @@
+name: Run Pytest Tests
+
+on: [push, pull_request]
+  # push:
+  #   branches: [main]
+  # pull_request:
+  #   branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'  # or your preferred version
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install .[dev]  # Assumes dev dependencies are listed in pyproject.toml
+
+    - name: Run tests
+      run: pytest tests/
