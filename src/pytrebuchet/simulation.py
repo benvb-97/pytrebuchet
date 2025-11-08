@@ -46,20 +46,6 @@ class Simulation:
         self._solve_ground_sliding_phase()
         self._solve_sling_phase()
         self._solve_free_flight_phase()
-
-        # Collect and store results
-        self.angle_arm = np.concatenate((
-            self._solution_sliding_phase.y[0, :],
-            self._solution_sling_phase.y[0, :],
-        ))
-        self.angle_weight = np.concatenate((
-            self._solution_sliding_phase.y[1, :],
-            self._solution_sling_phase.y[1, :],
-        ))
-        self.angle_projectile = np.concatenate((
-            self._solution_sliding_phase.y[2, :],
-            self._solution_sling_phase.y[2, :],
-        ))
         
     def _solve_ground_sliding_phase(self):
         """
@@ -102,7 +88,7 @@ class Simulation:
         
         # Define the time span for the integration, and the time evaluation points
         t_span = (0.0, 5.0)
-        t_eval=np.linspace(0.0, 5.0, 1000)
+        t_eval=np.linspace(0.0, 5.0, 5*200)
 
         # Solve the ODE
         self._solution_sliding_phase = solve_ivp(fun=sliding_projectile_ode,
@@ -155,7 +141,7 @@ class Simulation:
 
         # Define the time span for the integration, and the time evaluation points
         t_span=(self.ground_separation_time, self.ground_separation_time + 5.0)
-        t_eval=np.linspace(self.ground_separation_time,self.ground_separation_time + 5.0, 1000)
+        t_eval=np.linspace(self.ground_separation_time,self.ground_separation_time + 5.0, 5*200)
 
         # solve the ODE
         self._solution_sling_phase = solve_ivp(fun=sling_projectile_ode,
@@ -201,7 +187,7 @@ class Simulation:
 
         # Define the time span for the integration, and the time evaluation points
         t_span=(self.sling_release_time, self.sling_release_time + 100.0)
-        t_eval=np.linspace(self.sling_release_time, self.sling_release_time + 100.0, 1000)
+        t_eval=np.linspace(self.sling_release_time, self.sling_release_time + 100.0, 100*200)
 
         # solve the ODE
         self._solution_free_flight_phase = solve_ivp(fun=free_flight_ode,
