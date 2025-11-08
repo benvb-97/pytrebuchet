@@ -1,9 +1,6 @@
 import numpy as np
 
 
-import numpy as np
-
-
 def drag_coefficient_smooth_sphere_clift_grace_weber(
     reynolds_number: float | np.ndarray[float],
 ) -> float | np.ndarray[float]:
