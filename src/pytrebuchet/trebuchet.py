@@ -1,7 +1,7 @@
 import warnings
 
 import numpy as np
-from numpy import sin, cos
+from numpy import cos, sin
 
 
 class Trebuchet:
@@ -232,7 +232,7 @@ class Trebuchet:
         )
 
         return vx, vy
-    
+
     def calculate_projectile_acceleration(
         self,
         angle_arm: float | np.ndarray[float],
@@ -244,14 +244,14 @@ class Trebuchet:
     ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
         """
         Calculates the x, y components of the projectile acceleration based on the given arm and projectile angles, angular velocities and angular accelerations.
-        
+
         :param angle_arm: angle of the arm (radians)
         :param angle_projectile: angle of the projectile (radians)
         :param angular_velocity_arm: angular velocity of the arm (radians/s)
         :param angular_velocity_projectile: angular velocity of the projectile sling (radians/s)
         :param angular_acceleration_arm: angular acceleration of the arm (radians/s^2)
         :param angular_acceleration_projectile: angular acceleration of the projectile sling (radians/s^2)
-        
+
         :return: x, y components of the projectile acceleration
         """
 
@@ -264,9 +264,19 @@ class Trebuchet:
             angular_acceleration_projectile,
         )
         l2, l3 = self.l_projectile_arm, self.l_sling_projectile
-        
-        ax = l2*sin(theta)*ddtheta + l2*cos(theta)*dtheta**2 - l3*sin(psi)*ddpsi - l3*cos(psi)*dpsi**2
-        ay = l2*sin(theta)*dtheta**2 - l2*cos(theta)*ddtheta - l3*sin(psi)*dpsi**2 + l3*cos(psi)*ddpsi
+
+        ax = (
+            l2 * sin(theta) * ddtheta
+            + l2 * cos(theta) * dtheta**2
+            - l3 * sin(psi) * ddpsi
+            - l3 * cos(psi) * dpsi**2
+        )
+        ay = (
+            l2 * sin(theta) * dtheta**2
+            - l2 * cos(theta) * ddtheta
+            - l3 * sin(psi) * dpsi**2
+            + l3 * cos(psi) * ddpsi
+        )
 
         return ax, ay
 

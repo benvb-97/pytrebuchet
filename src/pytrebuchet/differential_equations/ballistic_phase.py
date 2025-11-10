@@ -12,7 +12,7 @@ def ballistic_ode(
     Represents the ordinary differential equations (ODEs) for a ballistic projectile after release from the sling.
 
     :param t: time variable (not used in this function but required for ODE solvers)
-    
+
     :param y: tuple containing the state variables:
         (px, py, vx, vy)
         where:

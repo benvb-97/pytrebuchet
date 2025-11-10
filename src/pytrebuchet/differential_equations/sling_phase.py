@@ -21,7 +21,7 @@ def sling_projectile_ode(
         dtheta: angular velocity of the arm
         dphi: angular velocity of the weight
         dpsi: angular velocity of the projectile
-    
+
     :param args: additional parameters required for the equations:
         (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
         where:
@@ -36,7 +36,7 @@ def sling_projectile_ode(
         ma: mass of the arm
         g: gravitational acceleration
         release_angle: desired release angle of the projectile
-    
+
     :return: derivatives: tuple containing the derivatives of the state variables: (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
 

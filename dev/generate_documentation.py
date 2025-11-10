@@ -2,7 +2,6 @@
 Generates the documentation for the pytrebuchet project using Sphinx.
 """
 
-
 if __name__ == "__main__":
     import os
 
@@ -20,6 +19,6 @@ if __name__ == "__main__":
 
     # Generate rst files from docstrings
     os.system("sphinx-apidoc -o source/ ../src/pytrebuchet")
-    
+
     # Generate the documentation using Sphinx
     os.system("sphinx-build -b html source build/html")

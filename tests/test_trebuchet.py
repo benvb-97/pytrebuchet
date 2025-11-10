@@ -139,7 +139,9 @@ class TestTrebuchet:
         """Test that sling tension verification works correctly."""
         trebuchet = init_trebuchet()
         projectile = Projectile.default()
-        simulation = Simulation(trebuchet, projectile, verify_sling_tension=False)  # will verify manually
+        simulation = Simulation(
+            trebuchet, projectile, verify_sling_tension=False
+        )  # will verify manually
 
         simulation.solve()
 
@@ -157,7 +159,9 @@ class TestTrebuchet:
         trebuchet.l_projectile_arm = total_arm_length * arm_fraction
         trebuchet.l_weight_arm = total_arm_length * (1 - arm_fraction)
 
-        simulation = Simulation(trebuchet, projectile, verify_sling_tension=False)  # will verify manually
+        simulation = Simulation(
+            trebuchet, projectile, verify_sling_tension=False
+        )  # will verify manually
         simulation.solve()
         tension_array = simulation.where_sling_in_tension()
 

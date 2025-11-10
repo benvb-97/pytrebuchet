@@ -116,7 +116,7 @@ def ground_separation_event(
         m2: mass of the projectile
         ma: mass of the arm
         g: gravitational acceleration
-    
+
     :return: lambd: the lagrange multiplier, representing the normal force at the ground contact point
     """
 
