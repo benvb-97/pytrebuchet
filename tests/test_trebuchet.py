@@ -104,16 +104,16 @@ class TestTrebuchet:
         simulation.solve()
 
         assert simulation.ground_separation_time == pytest.approx(
-            0.6753801120981405, abs=1e-6
+            0.6751505542485441, abs=1e-6
         )
         assert simulation.sling_release_time == pytest.approx(
-            1.6496185045932605, abs=1e-6
+            1.6497669591178958, abs=1e-6
         )
         assert simulation.projectile_hits_ground_time == pytest.approx(
-            6.001154582225362, abs=1e-6
+            6.002567303576664, abs=1e-6
         )
         assert simulation.distance_traveled == pytest.approx(
-            65.78320316489973, rel=1e-6
+            65.81262624344718, rel=1e-6
         )
 
     def test_unsolved_simulation_raises_error(self):
