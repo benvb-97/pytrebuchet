@@ -46,6 +46,8 @@ class Simulation:
         air_kinematic_viscosity: float = AIR_KINEMATIC_VISCOSITY,
         gravitational_acceleration: float = GRAVITATIONAL_ACCELERATION_EARTH,
         verify_sling_tension: bool = True,
+        atol: float = 1e-6,
+        rtol: float = 1e-5,
     ) -> None:
         """
         Initializes the simulation with the given trebuchet and projectile.
@@ -57,6 +59,8 @@ class Simulation:
         :param air_kinematic_viscosity: Kinematic viscosity of the air in m^2/s (default is approximate value at 15 degrees Celsius at sea level)
         :param gravitational_acceleration: Gravitational acceleration in m/s^2 (default is Earth's gravity)
         :param verify_sling_tension: Whether to verify sling tension after solving the simulation (default is True)
+        :param atol: Absolute tolerance for the ODE solver (default is 1e-6)
+        :param rtol: Relative tolerance for the ODE solver (default is 1e-5), spikes in the distance calculations seem to occur for rtol >= 1e-4
 
         """
 
@@ -69,6 +73,10 @@ class Simulation:
         self.gravitational_acceleration = gravitational_acceleration
 
         self._verify_sling_tension = verify_sling_tension
+
+        # tolerances for the ODE solver
+        self._atol = atol  # absolute tolerance
+        self._rtol = rtol  # relative tolerance
 
         # solve_ivp solutions for each phase
         self._solution_sliding_phase = None
@@ -191,6 +199,8 @@ class Simulation:
             args=args,
             t_eval=t_eval,
             events=event,
+            atol=self._atol,
+            rtol=self._rtol,
         )
     
     def _solve_sling_phase(self):
@@ -237,6 +247,8 @@ class Simulation:
             args=args,
             t_eval=t_eval,
             events=event,
+            atol=self._atol,
+            rtol=self._rtol,
         )
 
     def _solve_ballistic_phase(self):
@@ -292,6 +304,8 @@ class Simulation:
             args=args,
             t_eval=t_eval,
             events=event,
+            atol=self._atol,
+            rtol=self._rtol,
         )
 
     @property
