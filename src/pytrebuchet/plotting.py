@@ -87,13 +87,12 @@ def animate_launch(
     fig, ax = plt.subplots()
 
     # Fetch time steps and angles
-    tsteps_trebuchet = simulation.tsteps_trebuchet[::skip]
-    tsteps_projectile = simulation.tsteps_projectile[::skip]
+    tsteps_trebuchet = simulation.get_tsteps(phase="trebuchet")[::skip]
+    tsteps_projectile = simulation.get_tsteps(phase="all")[::skip]
 
-    angles_arm, angles_weight, angles_projectile = simulation.angles_trebuchet
-    angles_arm = angles_arm[::skip]
-    angles_weight = angles_weight[::skip]
-    angles_projectile = angles_projectile[::skip]
+    trebuchet_vars = simulation.get_trebuchet_state_variables()
+    angles_arm = trebuchet_vars[:, 0][::skip]
+    angles_weight = trebuchet_vars[:, 1][::skip]
 
     # Calculate trebuchet points
     x_arm_weight, y_arm_weight = trebuchet.calculate_arm_endpoint_weight(angles_arm)
@@ -103,9 +102,9 @@ def animate_launch(
     x_weight, y_weight = trebuchet.calculate_weight_point(angles_arm, angles_weight)
 
     # Calculate projectile trajectory
-    x_projectile, y_projectile = simulation.projectile_trajectory
-    x_projectile = x_projectile[::skip]
-    y_projectile = y_projectile[::skip]
+    projectile_vars = simulation.get_projectile_state_variables(phase="all")
+    x_projectile = projectile_vars[::skip, 0]
+    y_projectile = projectile_vars[::skip, 1]
 
     # Set figure limits
     ax.set_xlim(np.min(x_projectile) - 1.0, np.max(x_projectile) + 1.0)

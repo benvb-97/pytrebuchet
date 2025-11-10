@@ -1,6 +1,7 @@
 import warnings
 
 import numpy as np
+from numpy import sin, cos
 
 
 class Trebuchet:
@@ -105,7 +106,7 @@ class Trebuchet:
             self.init_angle_projectile = -np.pi / 2
         else:  # projectile just touches the ground
             self.init_angle_projectile = np.arcsin(
-                (self.l_projectile_arm * np.sin(self.init_angle_arm) - self.h_pivot)
+                (self.l_projectile_arm * sin(self.init_angle_arm) - self.h_pivot)
                 / self.l_sling_projectile
             )
 
@@ -120,8 +121,8 @@ class Trebuchet:
         :return: x, y coordinates of the projectile arm endpoint, respectively
         """
 
-        x_arm_projectile = -self.l_projectile_arm * np.cos(angle_arm)
-        y_arm_projectile = self.h_pivot - self.l_projectile_arm * np.sin(angle_arm)
+        x_arm_projectile = -self.l_projectile_arm * cos(angle_arm)
+        y_arm_projectile = self.h_pivot - self.l_projectile_arm * sin(angle_arm)
 
         # perform checks (arm should not clip through the ground)
         if np.any(y_arm_projectile < -1e-15):
@@ -141,8 +142,8 @@ class Trebuchet:
         :return: x, y coordinates of the weight arm endpoint, respectively
         """
 
-        x_arm_weight = self.l_weight_arm * np.cos(angle_arm)
-        y_arm_weight = self.h_pivot + self.l_weight_arm * np.sin(angle_arm)
+        x_arm_weight = self.l_weight_arm * cos(angle_arm)
+        y_arm_weight = self.h_pivot + self.l_weight_arm * sin(angle_arm)
 
         # perform checks (arm should not clip through the ground)
         if np.any(y_arm_weight < -1e-15):
@@ -166,8 +167,8 @@ class Trebuchet:
 
         x_arm_weight, y_arm_weight = self.calculate_arm_endpoint_weight(angle_arm)
 
-        x_weight = x_arm_weight + np.cos(angle_weight) * self.l_sling_weight
-        y_weight = y_arm_weight + np.sin(angle_weight) * self.l_sling_weight
+        x_weight = x_arm_weight + cos(angle_weight) * self.l_sling_weight
+        y_weight = y_arm_weight + sin(angle_weight) * self.l_sling_weight
 
         return x_weight, y_weight
 
@@ -188,10 +189,10 @@ class Trebuchet:
         )
 
         x_projectile = (
-            x_arm_projectile + np.cos(angle_projectile) * self.l_sling_projectile
+            x_arm_projectile + cos(angle_projectile) * self.l_sling_projectile
         )
         y_projectile = (
-            y_arm_projectile + np.sin(angle_projectile) * self.l_sling_projectile
+            y_arm_projectile + sin(angle_projectile) * self.l_sling_projectile
         )
 
         # perform checks (projectile should not clip through the ground)
@@ -218,19 +219,56 @@ class Trebuchet:
         :return: x, y components of the projectile velocity
         """
 
-        vx = self.l_projectile_arm * angular_velocity_arm * np.sin(
+        vx = self.l_projectile_arm * angular_velocity_arm * sin(
             angle_arm
-        ) - self.l_sling_projectile * angular_velocity_projectile * np.sin(
+        ) - self.l_sling_projectile * angular_velocity_projectile * sin(
             angle_projectile
         )
 
-        vy = -self.l_projectile_arm * angular_velocity_arm * np.cos(
+        vy = -self.l_projectile_arm * angular_velocity_arm * cos(
             angle_arm
-        ) + self.l_sling_projectile * angular_velocity_projectile * np.cos(
+        ) + self.l_sling_projectile * angular_velocity_projectile * cos(
             angle_projectile
         )
 
         return vx, vy
+    
+    def calculate_projectile_acceleration(
+        self,
+        angle_arm: float | np.ndarray[float],
+        angle_projectile: float | np.ndarray[float],
+        angular_velocity_arm: float | np.ndarray[float],
+        angular_velocity_projectile: float | np.ndarray[float],
+        angular_acceleration_arm: float | np.ndarray[float],
+        angular_acceleration_projectile: float | np.ndarray[float],
+    ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
+        """
+        Calculates the x, y components of the projectile acceleration based on the given arm and projectile angles, angular velocities and angular accelerations.
+        
+        :param angle_arm: angle of the arm (radians)
+        :param angle_projectile: angle of the projectile (radians)
+        :param angular_velocity_arm: angular velocity of the arm (radians/s)
+        :param angular_velocity_projectile: angular velocity of the projectile sling (radians/s)
+        :param angular_acceleration_arm: angular acceleration of the arm (radians/s^2)
+        :param angular_acceleration_projectile: angular acceleration of the projectile sling (radians/s^2)
+        
+        :return: x, y components of the projectile acceleration
+        """
+
+        theta, psi, dtheta, dpsi, ddtheta, ddpsi = (
+            angle_arm,
+            angle_projectile,
+            angular_velocity_arm,
+            angular_velocity_projectile,
+            angular_acceleration_arm,
+            angular_acceleration_projectile,
+        )
+        l2, l3 = self.l_projectile_arm, self.l_sling_projectile
+        
+        ax = l2*sin(theta)*ddtheta + l2*cos(theta)*dtheta**2 - l3*sin(psi)*ddpsi - l3*cos(psi)*dpsi**2
+        ay = l2*sin(theta)*dtheta**2 - l2*cos(theta)*ddtheta - l3*sin(psi)*dpsi**2 + l3*cos(psi)*ddpsi
+
+        return ax, ay
 
     # Plotting functions
     def get_limits(self) -> tuple[tuple[float, float], tuple[float, float]]:

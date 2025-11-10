@@ -1,3 +1,6 @@
+from cmath import phase
+from functools import wraps
+import warnings
 import numpy as np
 from scipy.integrate import solve_ivp
 
@@ -7,7 +10,7 @@ from pytrebuchet.constants import (
     GRAVITATIONAL_ACCELERATION_EARTH,
 )
 from pytrebuchet.differential_equations import (
-    free_flight_ode,
+    ballistic_ode,
     ground_separation_event,
     projectile_hits_ground_event,
     projectile_release_event,
@@ -16,6 +19,21 @@ from pytrebuchet.differential_equations import (
 )
 from pytrebuchet.projectile import Projectile
 from pytrebuchet.trebuchet import Trebuchet
+
+
+def requires_solved(func):
+    """
+    Decorator that ensures the simulation has been solved before accessing the decorated method.
+    
+    Raises:
+        ValueError: If the simulation has not been run yet (self.solved is False).
+    """
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        if not self.solved:
+            raise ValueError("Simulation has not been run yet.")
+        return func(self, *args, **kwargs)
+    return wrapper
 
 
 class Simulation:
@@ -28,15 +46,19 @@ class Simulation:
         air_density: float = AIR_DENSITY,
         air_kinematic_viscosity: float = AIR_KINEMATIC_VISCOSITY,
         gravitational_acceleration: float = GRAVITATIONAL_ACCELERATION_EARTH,
+        verify_sling_tension: bool = True,
     ) -> None:
         """
         Initializes the simulation with the given trebuchet and projectile.
+
         :param trebuchet: Trebuchet object containing trebuchet parameters
         :param projectile: Projectile object containing projectile parameters
         :param wind_speed: Wind speed in m/s (default is 0.0)
         :param air_density: Density of the air in kg/m^3 (default is standard air density at sea level)
         :param air_kinematic_viscosity: Kinematic viscosity of the air in m^2/s (default is approximate value at 15 degrees Celsius at sea level)
         :param gravitational_acceleration: Gravitational acceleration in m/s^2 (default is Earth's gravity)
+        :param verify_sling_tension: Whether to verify sling tension after solving the simulation (default is True)
+
         """
 
         self.trebuchet = trebuchet
@@ -47,10 +69,12 @@ class Simulation:
         self.air_kinematic_viscosity = air_kinematic_viscosity
         self.gravitational_acceleration = gravitational_acceleration
 
+        self._verify_sling_tension = verify_sling_tension
+
         # solve_ivp solutions for each phase
         self._solution_sliding_phase = None
         self._solution_sling_phase = None
-        self._solution_free_flight_phase = None
+        self._solution_ballistic_phase = None
 
     def solve(self):
         """
@@ -60,8 +84,65 @@ class Simulation:
         # Solve differential equations for each phase
         self._solve_ground_sliding_phase()
         self._solve_sling_phase()
-        self._solve_free_flight_phase()
+        self._solve_ballistic_phase()
 
+        # Warn the user if sling tension verification fails
+        if self._verify_sling_tension is True and not np.all(self.where_sling_in_tension()):
+            warnings.warn("Sling tension verification failed: sling goes slack during the simulation.")
+
+    def _get_args_sliding_phase(self):
+        """
+        Returns the arguments for the sliding phase differential equations.
+
+        :return: Tuple of arguments for the sliding phase ODEs.
+        """
+        return (
+            self.trebuchet.l_weight_arm,
+            self.trebuchet.l_projectile_arm,
+            self.trebuchet.l_sling_projectile,
+            self.trebuchet.l_sling_weight,
+            self.trebuchet.d_pivot_to_arm_cog,
+            self.trebuchet.inertia_arm,
+            self.trebuchet.mass_weight,
+            self.projectile.mass,
+            self.trebuchet.mass_arm,
+            self.gravitational_acceleration,
+        )
+    
+    def _get_args_sling_phase(self):
+        """
+        Returns the arguments for the sling phase differential equations.
+
+        :return: Tuple of arguments for the sling phase ODEs.
+        """
+        return (
+            self.trebuchet.l_weight_arm,
+            self.trebuchet.l_projectile_arm,
+            self.trebuchet.l_sling_projectile,
+            self.trebuchet.l_sling_weight,
+            self.trebuchet.d_pivot_to_arm_cog,
+            self.trebuchet.inertia_arm,
+            self.trebuchet.mass_weight,
+            self.projectile.mass,
+            self.trebuchet.mass_arm,
+            self.gravitational_acceleration,
+            self.trebuchet.release_angle,
+        )
+    
+    def _get_args_ballistic_phase(self):
+        """
+        Returns the arguments for the ballistic phase differential equations.
+
+        :return: Tuple of arguments for the ballistic phase ODEs.
+        """
+        return (
+            self.wind_speed,
+            self.air_density,
+            self.air_kinematic_viscosity,
+            self.gravitational_acceleration,
+            self.projectile,
+        )
+    
     def _solve_ground_sliding_phase(self):
         """
         Solves the differential equations for the ground sliding phase of the trebuchet simulation.
@@ -80,23 +161,7 @@ class Simulation:
         """
 
         # Define the constants for the differential equations
-        # l1, l2,
-        # l3, l4,
-        # la, Ia,
-        # m1, m2,
-        # ma, g
-        args = (
-            self.trebuchet.l_weight_arm,
-            self.trebuchet.l_projectile_arm,
-            self.trebuchet.l_sling_projectile,
-            self.trebuchet.l_sling_weight,
-            self.trebuchet.d_pivot_to_arm_cog,
-            self.trebuchet.inertia_arm,
-            self.trebuchet.mass_weight,
-            self.projectile.mass,
-            self.trebuchet.mass_arm,
-            self.gravitational_acceleration,
-        )
+        args = self._get_args_sliding_phase()
 
         # Define the event to stop the integration when the projectile separates from the ground
         def event(t, y, *args):
@@ -128,7 +193,7 @@ class Simulation:
             t_eval=t_eval,
             events=event,
         )
-
+    
     def _solve_sling_phase(self):
         """
         Solves the differential equations for the sling phase of the trebuchet simulation.
@@ -147,25 +212,7 @@ class Simulation:
         """
 
         # Define the constants for the differential equations
-        # l1, l2,
-        # l3, l4,
-        # la, Ia,
-        # m1, m2,
-        # ma, g
-        # release_angle
-        args = (
-            self.trebuchet.l_weight_arm,
-            self.trebuchet.l_projectile_arm,
-            self.trebuchet.l_sling_projectile,
-            self.trebuchet.l_sling_weight,
-            self.trebuchet.d_pivot_to_arm_cog,
-            self.trebuchet.inertia_arm,
-            self.trebuchet.mass_weight,
-            self.projectile.mass,
-            self.trebuchet.mass_arm,
-            self.gravitational_acceleration,
-            self.trebuchet.release_angle,
-        )
+        args = self._get_args_sling_phase()
 
         # Define the event to stop the integration when the projectile is released from the sling
         def event(t, y, *args):
@@ -193,9 +240,9 @@ class Simulation:
             events=event,
         )
 
-    def _solve_free_flight_phase(self):
+    def _solve_ballistic_phase(self):
         """
-        Solves the differential equations for the free flight phase of the trebuchet simulation.
+        Solves the differential equations for the ballistic phase of the trebuchet simulation.
 
         The differential equations have the following arguments:
         wind_speed: wind speed
@@ -206,15 +253,7 @@ class Simulation:
         """
 
         # Define the constants for the differential equations
-        # wind_speed, rho, nu,
-        # g, projectile
-        args = (
-            self.wind_speed,
-            self.air_density,
-            self.air_kinematic_viscosity,
-            self.gravitational_acceleration,
-            self.projectile,
-        )
+        args = self._get_args_ballistic_phase()
 
         # Define the event to stop the integration when the projectile hits the ground
         def event(t, y, *args):
@@ -247,8 +286,8 @@ class Simulation:
         )
 
         # solve the ODE
-        self._solution_free_flight_phase = solve_ivp(
-            fun=free_flight_ode,
+        self._solution_ballistic_phase = solve_ivp(
+            fun=ballistic_ode,
             t_span=t_span,
             y0=y0,
             args=args,
@@ -265,13 +304,14 @@ class Simulation:
         return (
             self._solution_sliding_phase is not None
             and self._solution_sling_phase is not None
-            and self._solution_free_flight_phase is not None
+            and self._solution_ballistic_phase is not None
         )
 
     @property
     def ground_separation_time(self) -> float:
         """
         Returns the time when the projectile separates from the ground, marking the end of the ground sliding phase.
+
         :return: Time when the projectile separates from the ground.
         """
         if self._solution_sliding_phase is None:
@@ -282,6 +322,7 @@ class Simulation:
     def sling_release_time(self) -> float:
         """
         Returns the time when the projectile is released from the sling, marking the end of the sling phase.
+
         :return: Time when the projectile is released from the sling.
         """
         if self._solution_sling_phase is None:
@@ -291,12 +332,13 @@ class Simulation:
     @property
     def projectile_hits_ground_time(self) -> float:
         """
-        Returns the time when the projectile hits the ground, marking the end of the free flight phase.
+        Returns the time when the projectile hits the ground, marking the end of the ballistic phase.
+
         :return: Time when the projectile hits the ground.
         """
-        if self._solution_free_flight_phase is None:
+        if self._solution_ballistic_phase is None:
             raise ValueError("Simulation has not been run yet.")
-        return self._solution_free_flight_phase.t_events[0][0]
+        return self._solution_ballistic_phase.t_events[0][0]
 
     @property
     def distance_traveled(self) -> float:
@@ -304,103 +346,201 @@ class Simulation:
         Returns the horizontal distance traveled by the projectile as measured from the pivot's x-coordinate.
         :return: Horizontal distance traveled by the projectile.
         """
-        if self._solution_free_flight_phase is None:
+        if self._solution_ballistic_phase is None:
             raise ValueError("Simulation has not been run yet.")
 
-        return self._solution_free_flight_phase.y_events[0][0, 0]
+        return self._solution_ballistic_phase.y_events[0][0, 0]
 
-    @property
-    def tsteps_trebuchet(self) -> np.ndarray[float] | None:
+    @requires_solved
+    def get_tsteps(self, phase: str = "all") -> np.ndarray[float]:
         """
-        Returns the time steps for the trebuchet phases concatenated into a single array.
-        :return: Numpy array of time steps for the trebuchet phases, or None if the simulation has not been run.
-        """
-        if not self.solved:
-            raise ValueError("Simulation has not been run yet.")
+        Returns the time steps for the specified phase(s) of the simulation.
 
-        tsteps = np.concatenate(
-            (
-                self._solution_sliding_phase.t,
-                self._solution_sling_phase.t,
+        :param phase: Phase of the simulation to get time steps for. 
+            Options are:
+            "all" - all phases (default)
+            "sliding" - ground sliding phase
+            "sling" - sling phase
+            "ballistic" - ballistic phase
+            "trebuchet" - trebuchet phases (ground sliding + sling)
+
+        :return: Numpy array of time steps for the specified phase(s).
+        """
+
+        if phase == "all":
+            t_arrays = (
+                self._solution_sliding_phase.t, self._solution_sliding_phase.t_events[0],
+                self._solution_sling_phase.t, self._solution_sling_phase.t_events[0],
+                self._solution_ballistic_phase.t, self._solution_ballistic_phase.t_events[0],
             )
-        )
-        return tsteps
-
-    @property
-    def tsteps_projectile(self) -> np.ndarray[float] | None:
-        """
-        Returns the time steps for the projectile phases concatenated into a single array.
-        :return: Numpy array of time steps for the projectile phases, or None if the simulation has not been run.
-        """
-        if not self.solved:
-            raise ValueError("Simulation has not been run yet.")
-
-        tsteps = np.concatenate(
-            (
-                self._solution_sliding_phase.t,
-                self._solution_sling_phase.t,
-                self._solution_free_flight_phase.t,
+        elif phase == "sliding":
+            t_arrays = (self._solution_sliding_phase.t, self._solution_sliding_phase.t_events[0])
+        elif phase == "sling":
+            t_arrays = (self._solution_sling_phase.t, self._solution_sling_phase.t_events[0])
+        elif phase == "ballistic":
+            t_arrays = (self._solution_ballistic_phase.t, self._solution_ballistic_phase.t_events[0])
+        elif phase == "trebuchet":
+            t_arrays = (
+                self._solution_sliding_phase.t, self._solution_sliding_phase.t_events[0],
+                self._solution_sling_phase.t, self._solution_sling_phase.t_events[0],
             )
-        )
-        return tsteps
+        else:
+            raise ValueError(f"Invalid phase '{phase}'. Valid options are 'all', 'sliding', 'sling', 'ballistic', 'trebuchet'.")
+        
+        return np.concatenate(t_arrays)
 
-    @property
-    def angles_trebuchet(
-        self,
-    ) -> tuple[np.ndarray[float], np.ndarray[float], np.ndarray[float]] | None:
+    @requires_solved
+    def get_trebuchet_state_variables(self, calculate_accelerations: bool = False) -> np.ndarray[float]:
         """
-        Returns the angles of the trebuchet components (arm, weight, projectile) concatenated into single arrays.
-        :return: Tuple of numpy arrays containing the angles of the arm, weight, and projectile, or None if the simulation has not been run.
+        Returns the state variables (angles and angular velocities) of the trebuchet throughout its operation.
+
+        :param calculate_accelerations: 
+            Whether to include angular accelerations in the returned array (default is False)
+
+        :return: Numpy array of shape (n, 6) or (n, 9) where n is the number of time steps, containing the state variables 
+            [
+            angle_arm, 
+            angle_weight, 
+            angle_projectile, 
+            angular_velocity_arm, 
+            angular_velocity_weight, 
+            angular_velocity_projectile,
+            angular_acceleration_arm (if calculate_accelerations is True),
+            angular_acceleration_weight (if calculate_accelerations is True),
+            angular_acceleration_projectile (if calculate_accelerations is True),
+            ]
         """
-        if not self.solved:
-            raise ValueError("Simulation has not been run yet.")
 
-        variables = np.concatenate(
-            (
-                self._solution_sliding_phase.y.T,
-                self._solution_sliding_phase.y_events[0],
-                self._solution_sling_phase.y.T,
-                self._solution_sling_phase.y_events[0],
-            ),
-            axis=0,
-        )
+        # Fetch state variables from sliding and sling phases
+        variables_sliding = np.concatenate((self._solution_sliding_phase.y.T, self._solution_sliding_phase.y_events[0]), axis=0)
+        variables_sling = np.concatenate((self._solution_sling_phase.y.T, self._solution_sling_phase.y_events[0]), axis=0)
 
-        angles_arm, angles_weight, angles_projectile = (
-            variables[:, 0],
-            variables[:, 1],
-            variables[:, 2],
-        )
-        return angles_arm, angles_weight, angles_projectile
+        # Add angular accelerations if requested
+        if calculate_accelerations:
+            t_sliding = self.get_tsteps(phase="sliding")
+            t_sling = self.get_tsteps(phase="sling")
 
-    @property
-    def projectile_trajectory(self) -> tuple[np.ndarray[float], np.ndarray[float]]:
+            # Calculate angular accelerations at each time step
+            acc_sliding = np.zeros((variables_sliding.shape[0], 3))
+            acc_sling = np.zeros((variables_sling.shape[0], 3))
+
+            for i in range(t_sliding.size):
+                acc_sliding[i, :] = sliding_projectile_ode(None, variables_sliding[i, :], *self._get_args_sliding_phase())[3:]
+            for i in range(t_sling.size):
+                acc_sling[i, :] = sling_projectile_ode(None, variables_sling[i, :], *self._get_args_sling_phase())[3:]
+
+            # Concatenate accelerations to state variables
+            variables_sliding = np.hstack((variables_sliding, acc_sliding))
+            variables_sling = np.hstack((variables_sling, acc_sling))
+
+        # Concatenate sliding and sling phase variables
+        return np.concatenate((variables_sliding, variables_sling), axis=0)
+    
+    @requires_solved
+    def get_projectile_state_variables(self, phase: str = "all", calculate_accelerations: bool = False) -> np.ndarray[float]:
         """
-        Returns the x and y positions of the projectile throughout its flight.
-        :return: Tuple of numpy arrays containing the x and y positions of the projectile.
+        Returns the state variables (positions, velocities, optional accelerations) of the projectile throughout its flight.
+
+        :param phase: Phase of the simulation to get projectile state variables for. 
+            Options are:
+            "all" - all phases (default)
+            "ballistic" - ballistic phase
+            "trebuchet" - trebuchet phases (ground sliding + sling)
+
+        :param calculate_accelerations: 
+            Whether to include accelerations in the returned array (default is False)
+
+        :return: Numpy array of shape (n, 4) or (n, 6) where n is the number of time steps, containing the state variables 
+            [
+            position_x,
+            position_y,
+            velocity_x,
+            velocity_y,
+            acceleration_x (if calculate_accelerations is True),
+            acceleration_y (if calculate_accelerations is True),
+            ]
         """
-        if not self.solved:
-            raise ValueError("Simulation has not been run yet.")
+        if phase not in ("all", "ballistic", "trebuchet"):
+            raise ValueError(f"Invalid phase '{phase}'. Valid options are 'all', 'ballistic', 'trebuchet'.")
+        
+        # Initialize array to hold projectile state variables
+        projectile_vars = np.empty((self.get_tsteps(phase=phase).shape[0], 4 + (2 if calculate_accelerations else 0)), dtype=float)
+        start_idx = 0
 
-        # Calculate projectile positions during trebuchet phases
-        angles_arm, angles_weight, angles_projectile = self.angles_trebuchet
-        x_projectile, y_projectile = self.trebuchet.calculate_projectile_point(
-            angle_arm=angles_arm, angle_projectile=angles_projectile
-        )
-
-        # Concatenate with projectile positions during free flight phase
-        x_projectile = np.concatenate(
-            (
-                x_projectile,
-                self._solution_free_flight_phase.y[0, :].T,
-                self._solution_free_flight_phase.y_events[0][:, 0],
+        if phase in ("all", "trebuchet"):  # Calculate positions and velocities from trebuchet state variables
+            trebuchet_vars = self.get_trebuchet_state_variables(calculate_accelerations=calculate_accelerations)
+            
+            theta, psi, dtheta, dpsi = trebuchet_vars[:, 0], trebuchet_vars[:, 2], trebuchet_vars[:, 3], trebuchet_vars[:, 5]
+            
+            px, py = self.trebuchet.calculate_projectile_point(angle_arm=theta, angle_projectile=psi)
+            vx, vy = self.trebuchet.calculate_projectile_velocity(
+                angle_arm=theta, angle_projectile=psi, angular_velocity_arm=dtheta, angular_velocity_projectile=dpsi
             )
-        )
-        y_projectile = np.concatenate(
-            (
-                y_projectile,
-                self._solution_free_flight_phase.y[1, :].T,
-                self._solution_free_flight_phase.y_events[0][:, 1],
-            )
-        )
 
-        return x_projectile, y_projectile
+            ntsteps_trebuchet = trebuchet_vars.shape[0]
+            projectile_vars[:ntsteps_trebuchet, 0] = px
+            projectile_vars[:ntsteps_trebuchet, 1] = py
+            projectile_vars[:ntsteps_trebuchet, 2] = vx
+            projectile_vars[:ntsteps_trebuchet, 3] = vy
+
+            # Calculate accelerations if requested
+            if calculate_accelerations:  
+                ddtheta, ddpsi = trebuchet_vars[:, 6], trebuchet_vars[:, 8]
+                ax, ay = self.trebuchet.calculate_projectile_acceleration(
+                    angle_arm=theta,
+                    angle_projectile=psi,
+                    angular_velocity_arm=dtheta,
+                    angular_velocity_projectile=dpsi,
+                    angular_acceleration_arm=ddtheta,
+                    angular_acceleration_projectile=ddpsi,
+                )
+                projectile_vars[:ntsteps_trebuchet, 4] = ax
+                projectile_vars[:ntsteps_trebuchet, 5] = ay
+
+            # Update index
+            start_idx += ntsteps_trebuchet
+
+        if phase in ("all", "ballistic"):  # Fetch positions and velocities from ballistic phase solution
+            t_ballistic = self.get_tsteps(phase="ballistic")
+            end_idx = start_idx + t_ballistic.size
+
+            projectile_vars[start_idx:end_idx, :4] = np.concatenate((self._solution_ballistic_phase.y.T,
+                                                                     self._solution_ballistic_phase.y_events[0]), axis=0)
+            
+            # Calculate accelerations if requested
+            if calculate_accelerations:
+                # Calculate angular accelerations at each time step
+                acc_ballistic = np.zeros((t_ballistic.size, 3))
+
+                for i in range(t_ballistic.size):
+                    acc_ballistic[i, :] = ballistic_ode(None, projectile_vars[i, :4], *self._get_args_ballistic_phase())[2:]
+
+                # Concatenate accelerations to state variables
+                projectile_vars[start_idx:end_idx, 4:] = acc_ballistic
+        
+        return projectile_vars
+
+    @requires_solved
+    def where_sling_in_tension(self) -> np.ndarray[bool]:
+        """
+        Determines whether the sling is in tension throughout the trebuchet phases of the simulation.
+
+        :return: Numpy array of booleans indicating whether the sling is in tension at each time step during the trebuchet phases.
+        """
+
+        # Get acceleration vector of the projectile
+        projectile_vars = self.get_projectile_state_variables(phase="trebuchet", calculate_accelerations=True)
+        ax, ay = projectile_vars[:, 4], projectile_vars[:, 5]
+
+        # Get sling direction vector
+        trebuchet_vars = self.get_trebuchet_state_variables(calculate_accelerations=False)
+        x_arm, y_arm = self.trebuchet.calculate_arm_endpoint_projectile(angle_arm=trebuchet_vars[:, 0])
+        x_pro, y_pro = self.trebuchet.calculate_projectile_point(angle_arm=trebuchet_vars[:, 0], angle_projectile=trebuchet_vars[:, 2])
+        
+        dx = x_pro - x_arm
+        dy = y_pro - y_arm
+
+        # Sling is in tension when the projection of the acceleration vector onto the sling direction is negative
+        sling_tension_positive = (ax * dx + ay * dy) < 0.
+
+        return sling_tension_positive

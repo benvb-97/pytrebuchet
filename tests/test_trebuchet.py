@@ -115,3 +115,53 @@ class TestTrebuchet:
         assert simulation.distance_traveled == pytest.approx(
             65.78320316489973, rel=1e-6
         )
+
+    def test_unsolved_simulation_raises_error(self):
+        """Test that accessing results before solving raises ValueError."""
+        trebuchet = init_trebuchet()
+        projectile = Projectile.default()
+        simulation = Simulation(trebuchet, projectile)
+
+        # Test that accessing methods requiring solved simulation raises ValueError
+        with pytest.raises(ValueError, match="Simulation has not been run yet"):
+            simulation.get_tsteps()
+
+        with pytest.raises(ValueError, match="Simulation has not been run yet"):
+            simulation.get_trebuchet_state_variables()
+
+        with pytest.raises(ValueError, match="Simulation has not been run yet"):
+            simulation.get_projectile_state_variables()
+
+        with pytest.raises(ValueError, match="Simulation has not been run yet"):
+            simulation.where_sling_in_tension()
+
+    def test_sling_tension_verification(self):
+        """Test that sling tension verification works correctly."""
+        trebuchet = init_trebuchet()
+        projectile = Projectile.default()
+        simulation = Simulation(trebuchet, projectile, verify_sling_tension=False)  # will verify manually
+
+        simulation.solve()
+
+        tension_array = simulation.where_sling_in_tension()
+
+        # Check that the tension array is boolean, has correct length and all values are True (sling in tension)
+        assert isinstance(tension_array, np.ndarray)
+        assert tension_array.dtype == bool
+        assert len(tension_array) == len(simulation.get_tsteps(phase="trebuchet"))
+        assert np.all(tension_array)
+
+        # Now test a case where the sling goes slack
+        total_arm_length = trebuchet.l_weight_arm + trebuchet.l_projectile_arm
+        arm_fraction = 0.65
+        trebuchet.l_projectile_arm = total_arm_length * arm_fraction
+        trebuchet.l_weight_arm = total_arm_length * (1 - arm_fraction)
+
+        simulation = Simulation(trebuchet, projectile, verify_sling_tension=False)  # will verify manually
+        simulation.solve()
+        tension_array = simulation.where_sling_in_tension()
+
+        assert isinstance(tension_array, np.ndarray)
+        assert tension_array.dtype == bool
+        assert len(tension_array) == len(simulation.get_tsteps(phase="trebuchet"))
+        assert not np.all(tension_array)
