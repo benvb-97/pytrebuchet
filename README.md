@@ -10,12 +10,6 @@ The differential equations governing the trebuchet's motion were derived using L
 
 The prediction of the projectile's trajectory by pytrebuchet has been verified by comparing it to the prediction made by [https://virtualtrebuchet.com/](https://virtualtrebuchet.com/) for the same configuration. 
 
-## Installation
-
-```bash
-python -m pip install pytrebuchet
-```
-
 ## License
 
 Pytrebuchet is provided under an MIT license that can be found in the LICENSE file.
