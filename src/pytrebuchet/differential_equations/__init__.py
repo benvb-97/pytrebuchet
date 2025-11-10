@@ -1,5 +1,5 @@
-from pytrebuchet.differential_equations.free_flight_phase import (
-    free_flight_ode,
+from pytrebuchet.differential_equations.ballistic_phase import (
+    ballistic_ode,
     projectile_hits_ground_event,
 )
 from pytrebuchet.differential_equations.sliding_phase import (
@@ -12,7 +12,7 @@ from pytrebuchet.differential_equations.sling_phase import (
 )
 
 __all__ = [
-    "free_flight_ode",
+    "ballistic_ode",
     "projectile_hits_ground_event",
     "ground_separation_event",
     "sliding_projectile_ode",

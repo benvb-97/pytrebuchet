@@ -3,13 +3,13 @@ import numpy as np
 from pytrebuchet.projectile import Projectile
 
 
-def free_flight_ode(
+def ballistic_ode(
     t,
     y,
     *args,
 ):
     """
-    Represents the ordinary differential equations (ODEs) for a projectile in free flight after release from the sling.
+    Represents the ordinary differential equations (ODEs) for a ballistic projectile after release from the sling.
 
     :param t: time variable (not used in this function but required for ODE solvers)
     
