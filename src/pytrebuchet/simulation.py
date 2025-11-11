@@ -96,6 +96,9 @@ class Simulation:
         self._solve_sling_phase()
         self._solve_ballistic_phase()
 
+        # Assert that projectile hits the ground
+        assert self.projectile_hits_ground_time is not None
+
         # Warn the user if sling tension verification fails
         if self._verify_sling_tension is True and not np.all(
             self.where_sling_in_tension()
@@ -380,11 +383,13 @@ class Simulation:
         :return: Velocity of the projectile at sling release.
         """
         # Kinetic energy of projectile at sling release
-        projectile_vars = self.get_projectile_state_variables(phase="trebuchet", calculate_accelerations=False)
-        vel_release = np.sqrt(projectile_vars[-1, 2]**2 + projectile_vars[-1, 3]**2)
+        projectile_vars = self.get_projectile_state_variables(
+            phase="trebuchet", calculate_accelerations=False
+        )
+        vel_release = np.sqrt(projectile_vars[-1, 2] ** 2 + projectile_vars[-1, 3] ** 2)
 
         return vel_release
-    
+
     @requires_solved
     def get_tsteps(self, phase: str = "all") -> np.ndarray[float]:
         """
@@ -621,7 +626,9 @@ class Simulation:
         return projectile_vars
 
     @requires_solved
-    def where_sling_in_tension(self, return_projection_array: bool = False) -> np.ndarray[bool]:
+    def where_sling_in_tension(
+        self, return_projection_array: bool = False
+    ) -> np.ndarray[bool]:
         """
         Determines whether the sling is in tension throughout the trebuchet phases of the simulation.
 
@@ -654,7 +661,7 @@ class Simulation:
         # Sling is in tension when the projection of the acceleration vector onto the sling direction is negative
         projection = -(ax * dx + ay * dy)
         sling_tension_positive = projection > 0.0
-        
+
         if return_projection_array:
             return projection
         return sling_tension_positive
