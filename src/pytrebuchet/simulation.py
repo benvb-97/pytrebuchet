@@ -621,9 +621,12 @@ class Simulation:
         return projectile_vars
 
     @requires_solved
-    def where_sling_in_tension(self) -> np.ndarray[bool]:
+    def where_sling_in_tension(self, return_projection_array: bool = False) -> np.ndarray[bool]:
         """
         Determines whether the sling is in tension throughout the trebuchet phases of the simulation.
+
+        :param return_projection_array:
+            If True, returns the projection values instead of booleans (default is False)
 
         :return: Numpy array of booleans indicating whether the sling is in tension at each time step during the trebuchet phases.
         """
@@ -649,6 +652,9 @@ class Simulation:
         dy = y_pro - y_arm
 
         # Sling is in tension when the projection of the acceleration vector onto the sling direction is negative
-        sling_tension_positive = (ax * dx + ay * dy) < 0.0
-
+        projection = -(ax * dx + ay * dy)
+        sling_tension_positive = projection > 0.0
+        
+        if return_projection_array:
+            return projection
         return sling_tension_positive
