@@ -371,6 +371,20 @@ class Simulation:
 
         return self._solution_ballistic_phase.y_events[0][0, 0]
 
+    @property
+    @requires_solved
+    def release_velocity(self) -> float:
+        """
+        Returns the velocity of the projectile at sling release.
+
+        :return: Velocity of the projectile at sling release.
+        """
+        # Kinetic energy of projectile at sling release
+        projectile_vars = self.get_projectile_state_variables(phase="trebuchet", calculate_accelerations=False)
+        vel_release = np.sqrt(projectile_vars[-1, 2]**2 + projectile_vars[-1, 3]**2)
+
+        return vel_release
+    
     @requires_solved
     def get_tsteps(self, phase: str = "all") -> np.ndarray[float]:
         """
