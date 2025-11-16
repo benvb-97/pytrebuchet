@@ -8,6 +8,7 @@ old/*
 *.html
 *.inv
 *.pickle
+*.coverage
 docs/build/*
 docs/source/*
 !docs/source/conf.py
