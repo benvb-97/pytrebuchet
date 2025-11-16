@@ -85,7 +85,7 @@ def whipper_projectile_constrained_ode(
     return dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi
 
 
-def projectile_separation_event(
+def whipper_projectile_separation_event(
     t,
     y,
     *args,
