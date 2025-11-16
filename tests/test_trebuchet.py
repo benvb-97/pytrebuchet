@@ -5,11 +5,11 @@ from pytrebuchet import Projectile, Simulation, Trebuchet
 from pytrebuchet.simulation import SimulationPhases
 
 
-def init_trebuchet(
+def init_hcw_trebuchet(
     projectile_touch_ground: bool = True,
 ) -> Trebuchet:
     """
-    Initializes a Trebuchet instance with predefined parameters for testing.
+    Initializes a hinged counterweight Trebuchet instance with predefined parameters for testing.
     :param projectile_touch_ground: If True, sets the parameters so that the projectile arm touches the ground.
     :return: Trebuchet instance
     """
@@ -36,7 +36,7 @@ def init_trebuchet(
 class TestTrebuchet:
     def test_initialization(self):
         # Test trebuchet initialization with projectile arm touching the ground
-        trebuchet = init_trebuchet()
+        trebuchet = init_hcw_trebuchet()
 
         assert trebuchet.l_weight_arm == 1.75
         assert trebuchet.l_projectile_arm == 6.8
@@ -52,14 +52,14 @@ class TestTrebuchet:
         assert trebuchet.init_angle_projectile == pytest.approx(0.0, abs=1e-12)
 
         # Test trebuchet initialization with projectile arm not touching the ground
-        trebuchet = init_trebuchet(projectile_touch_ground=False)
+        trebuchet = init_hcw_trebuchet(projectile_touch_ground=False)
 
         assert trebuchet.init_angle_arm == pytest.approx(55 * np.pi / 180, abs=1e-12)
         assert trebuchet.init_angle_weight == pytest.approx(-np.pi / 2, abs=1e-12)
         assert trebuchet.init_angle_projectile == pytest.approx(-np.pi / 2, abs=1e-12)
 
     def test_position_calculations(self):
-        trebuchet = init_trebuchet()
+        trebuchet = init_hcw_trebuchet()
 
         # test calculation of projectile arm end point
         x_ap, y_ap = trebuchet.calculate_arm_endpoint_projectile(
@@ -88,8 +88,8 @@ class TestTrebuchet:
         assert x_w == pytest.approx(1.1860592698914765, abs=1e-12)
         assert y_w == pytest.approx(4.286764705882353, abs=1e-12)
 
-    def test_simulation(self):
-        trebuchet = init_trebuchet()
+    def test_hcw_simulation(self):
+        trebuchet = init_hcw_trebuchet()
         projectile = Projectile(mass=4.0, diameter=0.35)
         simulation = Simulation(
             trebuchet,
@@ -117,7 +117,7 @@ class TestTrebuchet:
 
     def test_unsolved_simulation_raises_error(self):
         """Test that accessing results before solving raises ValueError."""
-        trebuchet = init_trebuchet()
+        trebuchet = init_hcw_trebuchet()
         projectile = Projectile.default()
         simulation = Simulation(trebuchet, projectile)
 
@@ -136,7 +136,7 @@ class TestTrebuchet:
 
     def test_sling_tension_verification(self):
         """Test that sling tension verification works correctly."""
-        trebuchet = init_trebuchet()
+        trebuchet = init_hcw_trebuchet()
         projectile = Projectile.default()
         simulation = Simulation(
             trebuchet, projectile, verify_sling_tension=False
@@ -168,3 +168,21 @@ class TestTrebuchet:
         assert tension_array.dtype == bool
         assert len(tension_array) == len(simulation.get_tsteps(phase=SimulationPhases.TREBUCHET))
         assert not np.all(tension_array)
+
+    def test_whipper_simulation(self):
+        trebuchet = Trebuchet.default_whipper()
+        projectile = Projectile.default()
+        simulation = Simulation(
+            trebuchet,
+            projectile,
+            wind_speed=0.0,
+            air_density=1.225,
+            air_kinematic_viscosity=1.47e-5,
+            gravitational_acceleration=9.81,
+        )
+
+        simulation.solve()
+
+        # Attempt to access launch distance and times to ensure simulation ran without errors
+        _ = simulation.distance_traveled
+        _ = simulation.get_phase_end_time(phase=SimulationPhases.BALLISTIC)
