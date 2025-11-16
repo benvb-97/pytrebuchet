@@ -34,6 +34,7 @@ def whipper_both_constrained_ode(
         m2: mass of the projectile
         ma: mass of the arm
         g: gravitational acceleration
+        release_angle: angle at which the sling releases the projectile
 
     :return: derivatives: tuple containing the derivatives of the state variables: (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
@@ -42,7 +43,7 @@ def whipper_both_constrained_ode(
     theta, phi, psi, dtheta, dphi, dpsi = (
         y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
     )
-    l1, l2, l3, l4, la, Ia, m1, m2, ma, g = args
+    l1, l2, l3, l4, la, Ia, m1, m2, ma, g, _ = args
 
     # Calculate terms
     I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
@@ -115,6 +116,7 @@ def whipper_weight_separation_event(
         m2: mass of the projectile
         ma: mass of the arm
         g: gravitational acceleration
+        release_angle: angle at which the sling releases the projectile
 
     :return: lambd: the lagrange multiplier, representing the normal force at the ground contact point
     """
@@ -123,7 +125,7 @@ def whipper_weight_separation_event(
     theta, phi, psi, dtheta, dphi, dpsi = (
         y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
     )
-    l1, l2, l3, l4, la, Ia, m1, m2, ma, g = args
+    l1, l2, l3, l4, la, Ia, m1, m2, ma, g, _ = args
 
     # Calculate terms
     I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
