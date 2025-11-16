@@ -142,6 +142,7 @@ class DesignOptimizer:
                 bounds=self._bounds,
                 constraints=constraints,
                 options=options,
+                tol=1e-6
             )
 
         return result
