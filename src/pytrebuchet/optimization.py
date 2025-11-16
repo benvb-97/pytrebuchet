@@ -24,6 +24,8 @@ class DesignOptimizer:
     """
     Class to perform design optimization of a trebuchet.
     Caches simulation results to avoid redundant computations.
+
+    Note: it only supports hinged counterweight trebuchets for now, not whipper-style trebuchets.
     """
 
     def __init__(
