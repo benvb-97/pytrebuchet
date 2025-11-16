@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        pip install .[dev]  # Assumes dev dependencies are listed in pyproject.toml
+        pip install -e .[dev]  # Assumes dev dependencies are listed in pyproject.toml
 
     - name: Run tests with coverage
       run: pytest tests/ --cov=src/pytrebuchet --cov-report=term --cov-report=xml
