@@ -13,7 +13,4 @@ if __name__ == "__main__":
     project_folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
     # Reformat import statements
-    os.system(f"isort {project_folder_path}")
-
-    # Reformat general code
-    os.system(f"black {project_folder_path}")
+    os.system(f"ruff format {project_folder_path}")
