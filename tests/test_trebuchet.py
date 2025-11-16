@@ -170,6 +170,7 @@ class TestTrebuchet:
         assert not np.all(tension_array)
 
     def test_whipper_simulation(self):
+        """Test simulation with a whipper-style trebuchet."""
         trebuchet = Trebuchet.default_whipper()
         projectile = Projectile.default()
         simulation = Simulation(
