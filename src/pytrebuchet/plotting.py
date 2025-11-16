@@ -2,7 +2,7 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pytrebuchet import Projectile, Simulation, Trebuchet
+from pytrebuchet import Projectile, Simulation, Trebuchet, SimulationPhases
 
 
 def plot_initial_position(trebuchet: Trebuchet, projectile: Projectile) -> None:
@@ -87,8 +87,8 @@ def animate_launch(
     fig, ax = plt.subplots()
 
     # Fetch time steps and angles
-    tsteps_trebuchet = simulation.get_tsteps(phase="trebuchet")[::skip]
-    tsteps_projectile = simulation.get_tsteps(phase="all")[::skip]
+    tsteps_trebuchet = simulation.get_tsteps(phase=SimulationPhases.TREBUCHET)[::skip]
+    tsteps_projectile = simulation.get_tsteps(phase=SimulationPhases.ALL)[::skip]
 
     trebuchet_vars = simulation.get_trebuchet_state_variables()
     angles_arm = trebuchet_vars[:, 0][::skip]
@@ -102,13 +102,13 @@ def animate_launch(
     x_weight, y_weight = trebuchet.calculate_weight_point(angles_arm, angles_weight)
 
     # Calculate projectile trajectory
-    projectile_vars = simulation.get_projectile_state_variables(phase="all")
+    projectile_vars = simulation.get_projectile_state_variables(phase=SimulationPhases.ALL)
     x_projectile = projectile_vars[::skip, 0]
     y_projectile = projectile_vars[::skip, 1]
 
     # Set figure limits
-    ax.set_xlim(np.min(x_projectile) - 1.0, np.max(x_projectile) + 1.0)
-    ax.set_ylim(-1.0, np.max(y_projectile) + 1.0)
+    ax.set_xlim(np.min(x_projectile) - 10.0, np.max(x_projectile) + 10.0)
+    ax.set_ylim(-1.0, np.max(y_projectile) + 10.0)
 
     # Create line plot objects between trebuchet points
     ax.plot([0.0, 0.0], [0.0, trebuchet.h_pivot], c="black")  # pivot line
@@ -136,7 +136,6 @@ def animate_launch(
     )
 
     def update(frame):
-
         if frame < tsteps_trebuchet.size:  # Animate both trebuchet and projectile
             line_arm_projectile.set_data(
                 [0.0, x_arm_projectile[frame]],

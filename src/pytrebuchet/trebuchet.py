@@ -26,6 +26,7 @@ class Trebuchet:
         release_angle: float,
         inertia_arm: float = None,
         d_pivot_to_arm_cog: float = None,
+        configuration: str = "hcw",
     ) -> None:
         """
         :param l_weight_arm: length of the arm positioned between the pivot and the weight. units: m
@@ -38,6 +39,9 @@ class Trebuchet:
         :param release_angle: angle at which the projectile is released from the sling. units: radians
         :param inertia_arm: inertia of the arm. units: kg*m^2
         :param d_pivot_to_arm_cog: distance from the pivot to the arm's center of gravity. units: m
+        :param configuration: configuration of the trebuchet. Options are 'hcw' (hinged counterweight) and 'whipper'.
+            A whipper trebuchet features a hinged counterweight system, but with the counterweight hanger positioned at the top of the throwing arm. 
+            When cocked, the arm points forward in the direction of the throw. At the start, the weight and projectile 'rest' on the trebuchet arm.
         """
 
         self.l_weight_arm = l_weight_arm
@@ -56,11 +60,19 @@ class Trebuchet:
             d_pivot_to_arm_cog = (l_projectile_arm - l_weight_arm) / 2
         self.d_pivot_to_arm_cog = d_pivot_to_arm_cog
 
-        self._calculate_initial_angles()
+        self.configuration = configuration
+        if self.configuration == "hcw":
+            self._calculate_initial_angles_hcw()
+        elif self.configuration == "whipper":
+            self._calculate_initial_angles_whipper()
+        else:
+            raise ValueError(
+                f"Invalid configuration '{self.configuration}'. Valid options are 'hcw' and 'whipper'."
+            )
 
     @classmethod
-    def default(cls) -> "Trebuchet":
-        """Creates a Trebuchet instance with default parameters as used by https://virtualtrebuchet.com/."""
+    def default_hcw(cls) -> "Trebuchet":
+        """Creates a hinged counterweight Trebuchet instance with default parameters as used by https://virtualtrebuchet.com/."""
         return cls(
             l_weight_arm=1.75,
             l_projectile_arm=6.792,
@@ -74,7 +86,22 @@ class Trebuchet:
             d_pivot_to_arm_cog=None,
         )
 
-    def _calculate_initial_angles(self) -> None:
+    @classmethod
+    def default_whipper(cls) -> "Trebuchet":
+        """Creates a whipper Trebuchet instance with default parameters."""
+        return cls(
+            l_weight_arm=2.0,
+            l_projectile_arm=4.0,
+            l_sling_projectile=4.0,
+            l_sling_weight=4,
+            h_pivot=5.0,
+            mass_arm=10.0,
+            mass_weight=100.0,
+            release_angle=45.0 * np.pi / 180.0,
+            configuration="whipper",
+        )
+
+    def _calculate_initial_angles_hcw(self) -> None:
         """
         Calculates the initial angles of the trebuchet (arm, projectile sling and weight sling) at the starting position.
 
@@ -109,6 +136,20 @@ class Trebuchet:
                 (self.l_projectile_arm * sin(self.init_angle_arm) - self.h_pivot)
                 / self.l_sling_projectile
             )
+
+    def _calculate_initial_angles_whipper(self) -> None:
+        """
+        Calculates the initial angles of the trebuchet (arm, projectile sling and weight sling) at the starting position for a whipper trebuchet.
+
+        Calculate:
+         -angle_arm such that the projectile arm end points upwards at a 45 degree angle in the direction of the launch.
+         -angle_weight such that the weight points upwards at a 55 degree angle in the direction of the launch.
+         -angle_projectile such that the projectile points downwards at a 45 degree angle in the direction opposite to the launch.,
+        """
+
+        self.init_angle_arm = (180 + 45) * np.pi / 180.0
+        self.init_angle_weight = (-270 - 30) * np.pi / 180.0
+        self.init_angle_projectile = (-90 - 50) * np.pi / 180.0
 
     # Position calculation functions
     def calculate_arm_endpoint_projectile(
