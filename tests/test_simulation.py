@@ -3,7 +3,6 @@ import pytest
 
 from pytrebuchet import Projectile, Simulation, Trebuchet
 from pytrebuchet.simulation import SimulationPhases
-from pytrebuchet.drag_coefficient import drag_coefficient_smooth_sphere_morrison
 
 
 def init_hcw_trebuchet(

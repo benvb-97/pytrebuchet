@@ -1,5 +1,3 @@
-import pytest
-from math import pi
 from pytrebuchet.projectile import Projectile
 
 from pytrebuchet.drag_coefficient import (

@@ -1,7 +1,7 @@
 from math import pi
 import pytest
 
-from pytrebuchet import DesignOptimizer, Trebuchet, Projectile, Simulation
+from pytrebuchet import DesignOptimizer
 from pytrebuchet.optimization import Parameters
 
 
