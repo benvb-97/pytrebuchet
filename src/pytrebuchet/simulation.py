@@ -568,8 +568,8 @@ class Simulation:
 
             projectile_vars[start_idx:end_idx, :4] = np.concatenate(
                 (
-                    self._solution_ballistic_phase.y.T,
-                    self._solution_ballistic_phase.y_events[0],
+                    self._phase_solutions[SimulationPhases.BALLISTIC].y.T,
+                    self._phase_solutions[SimulationPhases.BALLISTIC].y_events[0],
                 ),
                 axis=0,
             )
