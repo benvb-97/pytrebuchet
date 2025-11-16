@@ -69,8 +69,8 @@ class Trebuchet:
             )
         
     @classmethod
-    def default(cls) -> "Trebuchet":
-        """Creates a Trebuchet instance with default parameters as used by https://virtualtrebuchet.com/."""
+    def default_hcw(cls) -> "Trebuchet":
+        """Creates a hinged counterweight Trebuchet instance with default parameters as used by https://virtualtrebuchet.com/."""
         return cls(
             l_weight_arm=1.75,
             l_projectile_arm=6.792,
@@ -84,6 +84,21 @@ class Trebuchet:
             d_pivot_to_arm_cog=None,
         )
 
+    @classmethod
+    def default_whipper(cls) -> "Trebuchet":
+        """Creates a whipper Trebuchet instance with default parameters."""
+        return cls(
+            l_weight_arm=2.0,
+            l_projectile_arm=4.0,
+            l_sling_projectile=4.0,
+            l_sling_weight=4,
+            h_pivot=5.0,
+            mass_arm=10.0,
+            mass_weight=100.0,
+            release_angle=45.0 * np.pi / 180.0,
+            configuration="whipper",
+        )
+    
     def _calculate_initial_angles_hcw(self) -> None:
         """
         Calculates the initial angles of the trebuchet (arm, projectile sling and weight sling) at the starting position.
