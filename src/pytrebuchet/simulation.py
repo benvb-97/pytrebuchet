@@ -28,8 +28,8 @@ from pytrebuchet.trebuchet import Trebuchet
 
 class SimulationPhases(IntEnum):
     # Special phases, for post-processing but not simulation 
-    ALL = -2
-    TREBUCHET = -1
+    ALL = -2  # all phases
+    TREBUCHET = -1  # all phases except ballistic
 
     # General phases
     SLING_UNCONSTRAINED = 0
