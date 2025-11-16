@@ -39,7 +39,6 @@ def requires_solved(func):
 
 
 class Simulation:
-
     def __init__(
         self,
         trebuchet: Trebuchet,

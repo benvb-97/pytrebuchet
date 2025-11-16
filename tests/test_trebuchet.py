@@ -33,9 +33,7 @@ def init_trebuchet(
 
 
 class TestTrebuchet:
-
     def test_initialization(self):
-
         # Test trebuchet initialization with projectile arm touching the ground
         trebuchet = init_trebuchet()
 
