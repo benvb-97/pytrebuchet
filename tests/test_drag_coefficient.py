@@ -54,5 +54,3 @@ class TestDragCoefficientMorrison:
             assert "out of range" in str(w[0].message)
             assert issubclass(w[1].category, UserWarning)
             assert "out of range" in str(w[1].message)
-
-        

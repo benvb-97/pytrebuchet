@@ -18,7 +18,7 @@ class TestProjectile:
     def test_init_with_callable_drag_coefficient(self):
         def custom_drag(reynolds):
             return 0.5 if reynolds < 1000 else 0.3
-        
+
         projectile = Projectile(mass=3.0, diameter=0.25, drag_coefficient=custom_drag)
         assert projectile.mass == 3.0
         assert projectile.diameter == 0.25
@@ -29,4 +29,7 @@ class TestProjectile:
         projectile = Projectile(mass=4.0, diameter=0.35, drag_coefficient=None)
         assert projectile.mass == 4.0
         assert projectile.diameter == 0.35
-        assert projectile.drag_coefficient == drag_coefficient_smooth_sphere_clift_grace_weber
+        assert (
+            projectile.drag_coefficient
+            == drag_coefficient_smooth_sphere_clift_grace_weber
+        )
