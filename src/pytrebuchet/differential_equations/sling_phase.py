@@ -132,5 +132,5 @@ def projectile_release_event(
         return 1.0
     if vy < 0:  # projectile is moving downwards, avoid false release
         return 1.0
-    
+
     return velocity_angle - release_angle

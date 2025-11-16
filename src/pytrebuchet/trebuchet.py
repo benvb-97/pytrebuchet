@@ -40,7 +40,7 @@ class Trebuchet:
         :param inertia_arm: inertia of the arm. units: kg*m^2
         :param d_pivot_to_arm_cog: distance from the pivot to the arm's center of gravity. units: m
         :param configuration: configuration of the trebuchet. Options are 'hcw' (hinged counterweight) and 'whipper'.
-            A whipper trebuchet features a hinged counterweight system, but with the counterweight hanger positioned at the top of the throwing arm. 
+            A whipper trebuchet features a hinged counterweight system, but with the counterweight hanger positioned at the top of the throwing arm.
             When cocked, the arm points forward in the direction of the throw. At the start, the weight and projectile 'rest' on the trebuchet arm.
         """
 

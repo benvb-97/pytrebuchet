@@ -102,15 +102,15 @@ class TestTrebuchet:
 
         simulation.solve()
 
-        assert simulation.get_phase_end_time(phase=SimulationPhases.GROUND_SLIDING) == pytest.approx(
-            0.6751505542485441, abs=1e-6
-        )
-        assert simulation.get_phase_end_time(phase=SimulationPhases.SLING_UNCONSTRAINED) == pytest.approx(
-            1.6497669591178958, abs=1e-6
-        )
-        assert simulation.get_phase_end_time(phase=SimulationPhases.BALLISTIC) == pytest.approx(
-            6.002567303576664, abs=1e-6
-        )
+        assert simulation.get_phase_end_time(
+            phase=SimulationPhases.GROUND_SLIDING
+        ) == pytest.approx(0.6751505542485441, abs=1e-6)
+        assert simulation.get_phase_end_time(
+            phase=SimulationPhases.SLING_UNCONSTRAINED
+        ) == pytest.approx(1.6497669591178958, abs=1e-6)
+        assert simulation.get_phase_end_time(
+            phase=SimulationPhases.BALLISTIC
+        ) == pytest.approx(6.002567303576664, abs=1e-6)
         assert simulation.distance_traveled == pytest.approx(
             65.81262624344718, rel=1e-6
         )
@@ -149,7 +149,9 @@ class TestTrebuchet:
         # Check that the tension array is boolean, has correct length and all values are True (sling in tension)
         assert isinstance(tension_array, np.ndarray)
         assert tension_array.dtype == bool
-        assert len(tension_array) == len(simulation.get_tsteps(phase=SimulationPhases.TREBUCHET))
+        assert len(tension_array) == len(
+            simulation.get_tsteps(phase=SimulationPhases.TREBUCHET)
+        )
         assert np.all(tension_array)
 
         # Now test a case where the sling goes slack
@@ -166,7 +168,9 @@ class TestTrebuchet:
 
         assert isinstance(tension_array, np.ndarray)
         assert tension_array.dtype == bool
-        assert len(tension_array) == len(simulation.get_tsteps(phase=SimulationPhases.TREBUCHET))
+        assert len(tension_array) == len(
+            simulation.get_tsteps(phase=SimulationPhases.TREBUCHET)
+        )
         assert not np.all(tension_array)
 
     def test_whipper_simulation(self):

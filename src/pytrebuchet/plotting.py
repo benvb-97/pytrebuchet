@@ -102,7 +102,9 @@ def animate_launch(
     x_weight, y_weight = trebuchet.calculate_weight_point(angles_arm, angles_weight)
 
     # Calculate projectile trajectory
-    projectile_vars = simulation.get_projectile_state_variables(phase=SimulationPhases.ALL)
+    projectile_vars = simulation.get_projectile_state_variables(
+        phase=SimulationPhases.ALL
+    )
     x_projectile = projectile_vars[::skip, 0]
     y_projectile = projectile_vars[::skip, 1]
 

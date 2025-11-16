@@ -27,7 +27,7 @@ from pytrebuchet.trebuchet import Trebuchet
 
 
 class SimulationPhases(IntEnum):
-    # Special phases, for post-processing but not simulation 
+    # Special phases, for post-processing but not simulation
     ALL = -2  # all phases
     TREBUCHET = -1  # all phases except ballistic
 
@@ -58,6 +58,7 @@ phase_to_ode_map = {
     SimulationPhases.SLING_UNCONSTRAINED: sling_projectile_ode,
     SimulationPhases.BALLISTIC: ballistic_ode,
 }
+
 
 def requires_solved(func):
     """
@@ -222,6 +223,7 @@ class Simulation:
         # Define the event to stop the integration when the projectile separates from the ground
         def event(t, y, *args):
             return phase_to_event_map[phase](t, y, *args)
+
         event.terminal = True
         event.direction = 0
 
@@ -282,9 +284,9 @@ class Simulation:
         event.direction = 0
 
         # Define the initial conditions from the end of the sling phase
-        theta0, _, psi0, dtheta0, _, dpsi0 = self._phase_solutions[SimulationPhases.SLING_UNCONSTRAINED].y_events[0][
-            0, :
-        ]
+        theta0, _, psi0, dtheta0, _, dpsi0 = self._phase_solutions[
+            SimulationPhases.SLING_UNCONSTRAINED
+        ].y_events[0][0, :]
         px0, py0 = self.trebuchet.calculate_projectile_point(
             angle_arm=theta0, angle_projectile=psi0
         )
@@ -301,8 +303,7 @@ class Simulation:
         # Define the time span for the integration, and the time evaluation points
         release_time = self.get_phase_end_time(SimulationPhases.SLING_UNCONSTRAINED)
         t_span = (release_time, release_time + 100.0)
-        t_eval = np.linspace(release_time, release_time + 100.0, 100 * 200
-        )
+        t_eval = np.linspace(release_time, release_time + 100.0, 100 * 200)
 
         # solve the ODE
         self._phase_solutions[SimulationPhases.BALLISTIC] = solve_ivp(
@@ -319,18 +320,18 @@ class Simulation:
     def get_phase_end_time(self, phase: SimulationPhases) -> float:
         """
         Returns the end time of the specified phase.
-        
+
         :param phase: The phase to get the end time for.
-        
+
         :return: The end time of the specified phase.
         """
 
         if self._phase_solutions[phase] is None:
             raise ValueError(f"Phase {phase} has not been solved yet.")
-        
+
         end_time = self._phase_solutions[phase].t_events[0][0]
         return end_time
-    
+
     @property
     def solved(self) -> bool:
         """
@@ -370,7 +371,9 @@ class Simulation:
         return vel_release
 
     @requires_solved
-    def get_tsteps(self, phase: SimulationPhases = SimulationPhases.ALL) -> np.ndarray[float]:
+    def get_tsteps(
+        self, phase: SimulationPhases = SimulationPhases.ALL
+    ) -> np.ndarray[float]:
         """
         Returns the time steps for the specified phase(s) of the simulation.
 
@@ -382,14 +385,14 @@ class Simulation:
 
         :return: Numpy array of time steps for the specified phase(s).
         """
-    
+
         t_arrays = []
         if phase == SimulationPhases.ALL:
             for _phase in self.phases:
                 t_arrays.append(self._phase_solutions[_phase].t)
                 t_arrays.append(self._phase_solutions[_phase].t_events[0])
         elif phase == SimulationPhases.TREBUCHET:
-            for _phase in self.phases [:-1]:  # exclude ballistic phase
+            for _phase in self.phases[:-1]:  # exclude ballistic phase
                 t_arrays.append(self._phase_solutions[_phase].t)
                 t_arrays.append(self._phase_solutions[_phase].t_events[0])
         elif phase in self.phases:
@@ -405,9 +408,7 @@ class Simulation:
         return np.concatenate(t_arrays)
 
     @requires_solved
-    def _get_phase_state_variables(
-        self, phase: SimulationPhases
-    ) -> np.ndarray[float]:
+    def _get_phase_state_variables(self, phase: SimulationPhases) -> np.ndarray[float]:
         """
         Returns the state variables of the specified trebuchet phase.
         Combines the regular solution and the event solution.
@@ -419,7 +420,7 @@ class Simulation:
             ),
             axis=0,
         )
-    
+
     @requires_solved
     def get_trebuchet_state_variables(
         self, calculate_accelerations: bool = False
@@ -447,9 +448,8 @@ class Simulation:
         # Fetch state variables from trebuchet phases
         variables = []
         for phase in self.phases[:-1]:  # exclude ballistic phase
-
             variables_phase = self._get_phase_state_variables(phase)
-            
+
             # Add angular accelerations if requested
             if calculate_accelerations:
                 t_steps = self.get_tsteps(phase=phase)
@@ -472,7 +472,9 @@ class Simulation:
 
     @requires_solved
     def get_projectile_state_variables(
-        self, phase: SimulationPhases = SimulationPhases.ALL, calculate_accelerations: bool = False
+        self,
+        phase: SimulationPhases = SimulationPhases.ALL,
+        calculate_accelerations: bool = False,
     ) -> np.ndarray[float]:
         """
         Returns the state variables (positions, velocities, optional accelerations) of the projectile throughout its flight.
@@ -496,7 +498,11 @@ class Simulation:
             acceleration_y (if calculate_accelerations is True),
             ]
         """
-        if phase not in (SimulationPhases.ALL, SimulationPhases.BALLISTIC, SimulationPhases.TREBUCHET):
+        if phase not in (
+            SimulationPhases.ALL,
+            SimulationPhases.BALLISTIC,
+            SimulationPhases.TREBUCHET,
+        ):
             raise ValueError(
                 f"Invalid phase '{phase}'. Valid options are {SimulationPhases.ALL}, {SimulationPhases.BALLISTIC}, {SimulationPhases.TREBUCHET}."
             )
