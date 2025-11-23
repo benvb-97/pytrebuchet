@@ -1,15 +1,17 @@
+"""Module containing the differential equations for a sliding projectile."""
+
 import numpy as np
 from numpy import cos, sin
 
 
 def sliding_projectile_ode(
-    t,
-    y,
-    *args,
-):
-    """Represents the ordinary differential equations (ODEs) for a trebuchet with a projectile sliding over the ground.
-    :param t: time variable (not used in this function but required for ODE solvers)
+    t: float,
+    y: tuple[float, float, float, float, float, float],
+    *args: tuple,
+) -> tuple[float, float, float, float, float, float]:
+    """Ordinary differential equations (ODEs) for a projectile sliding over the ground.
 
+    :param t: time variable (not used in this function but required for ODE solvers)
     :param y: tuple containing the state variables:
         (theta, phi, psi, dtheta, dphi, dpsi)
         where:
@@ -19,7 +21,6 @@ def sliding_projectile_ode(
         dtheta: angular velocity of the arm
         dphi: angular velocity of the weight
         dpsi: angular velocity of the projectile
-
     :param args: additional parameters required for the equations:
         (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
         where:
@@ -35,29 +36,31 @@ def sliding_projectile_ode(
         g: gravitational acceleration
         release_angle: angle at which the projectile is released
 
-    :return: derivatives: tuple containing the derivatives of the state variables: (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
+    :return: derivatives:
+    tuple containing the derivatives of the state variables:
+     (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
-    # Fetch variables
-    theta, phi, psi, dtheta, dphi, dpsi = (
-        y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
-    )
-    l1, l2, l3, l4, la, Ia, m1, m2, ma, g, _ = args
+    _ = t  # Unused variable
+
+    # Fetch variables, arm, weight, sling
+    theta, phi, psi, dtheta, dphi, dpsi = y
+    l1, l2, l3, l4, la, inertia_a, m1, m2, ma, g, _ = args
 
     # Calculate terms
-    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
-    I1 = m1 * l4**2
-    I2 = m2 * l3**2
-    I14 = m1 * l1 * l4
-    I23 = m2 * l2 * l3
+    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + inertia_a  # noqa: N806
+    I1 = m1 * l4**2  # noqa: N806
+    I2 = m2 * l3**2  # noqa: N806
+    I14 = m1 * l1 * l4  # noqa: N806
+    I23 = m2 * l2 * l3  # noqa: N806
 
-    M = m1 * l1 - m2 * l2 - ma * la
-    M14 = m1 * l4
-    M23 = m2 * l3
+    M = m1 * l1 - m2 * l2 - ma * la  # noqa: N806
+    M14 = m1 * l4  # noqa: N806
+    M23 = m2 * l3  # noqa: N806
 
     gamma = -l2 * dtheta**2 * sin(theta) + l3 * dpsi**2 * sin(psi)
 
     # Create Ax=B matrix
-    A = np.array(
+    A = np.array(  # noqa: N806
         [
             [I0, I14 * cos(theta - phi), -I23 * cos(theta - psi), -l2 * cos(theta)],
             [I14 * cos(theta - phi), I1, 0, 0],
@@ -65,7 +68,7 @@ def sliding_projectile_ode(
             [-l2 * cos(theta), 0, l3 * cos(psi), 0],
         ]
     )
-    B = np.array(
+    B = np.array(  # noqa: N806
         [
             -I14 * dphi**2 * sin(theta - phi)
             + I23 * dpsi**2 * sin(theta - psi)
@@ -82,15 +85,15 @@ def sliding_projectile_ode(
 
 
 def ground_separation_event(
-    t,
-    y,
-    *args,
-):
-    """Calculates the lagrange multiplier for the ground separation event in a trebuchet with a sliding projectile.
+    t: float,
+    y: tuple[float, float, float, float, float, float],
+    *args: tuple,
+) -> float:
+    """Calculate lagrange multiplier for the ground separation event.
+
     When the lagrange multiplier becomes zero, the projectile separates from the ground.
 
     :param t: time variable (not used in this function but required for ODE solvers)
-
     :param y: tuple containing the state variables:
         (theta, phi, psi, dtheta, dphi, dpsi)
         where:
@@ -100,7 +103,6 @@ def ground_separation_event(
         dtheta: angular velocity of the arm
         dphi: angular velocity of the weight
         dpsi: angular velocity of the projectile
-
     :param args: additional parameters required for the equations:
         (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
         where:
@@ -116,29 +118,29 @@ def ground_separation_event(
         g: gravitational acceleration
         release_angle: angle at which the projectile is released
 
-    :return: lambd: the lagrange multiplier, representing the normal force at the ground contact point
+    :return: lambd: the lagrange multiplier
     """
-    # Fetch variables
-    theta, phi, psi, dtheta, dphi, dpsi = (
-        y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
-    )
-    l1, l2, l3, l4, la, Ia, m1, m2, ma, g, _ = args
+    _ = t  # Unused variable
+
+    # Fetch variables: arm, weight, sling
+    theta, phi, psi, dtheta, dphi, dpsi = y
+    l1, l2, l3, l4, la, Ia, m1, m2, ma, g, _ = args  # noqa: N806
 
     # Calculate terms
-    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia
-    I1 = m1 * l4**2
-    I2 = m2 * l3**2
-    I14 = m1 * l1 * l4
-    I23 = m2 * l2 * l3
+    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia  # noqa: N806
+    I1 = m1 * l4**2  # noqa: N806
+    I2 = m2 * l3**2  # noqa: N806
+    I14 = m1 * l1 * l4  # noqa: N806
+    I23 = m2 * l2 * l3  # noqa: N806
 
-    M = m1 * l1 - m2 * l2 - ma * la
-    M14 = m1 * l4
-    M23 = m2 * l3
+    M = m1 * l1 - m2 * l2 - ma * la  # noqa: N806
+    M14 = m1 * l4  # noqa: N806
+    M23 = m2 * l3  # noqa: N806
 
     gamma = -l2 * dtheta**2 * sin(theta) + l3 * dpsi**2 * sin(psi)
 
     # Create Ax=B matrix
-    A = np.array(
+    A = np.array(  # noqa: N806
         [
             [I0, I14 * cos(theta - phi), -I23 * cos(theta - psi), -l2 * cos(theta)],
             [I14 * cos(theta - phi), I1, 0, 0],
@@ -146,7 +148,7 @@ def ground_separation_event(
             [-l2 * cos(theta), 0, l3 * cos(psi), 0],
         ]
     )
-    B = np.array(
+    B = np.array(  # noqa: N806
         [
             -I14 * dphi**2 * sin(theta - phi)
             + I23 * dpsi**2 * sin(theta - psi)
@@ -157,6 +159,6 @@ def ground_separation_event(
         ]
     )
 
-    ddtheta, ddphi, ddpsi, lambd = np.linalg.solve(A, B)
+    _, _, _, lambd = np.linalg.solve(A, B)
 
     return lambd

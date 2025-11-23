@@ -1,3 +1,5 @@
+"""PyTrebuchet: A Python package for simulating and optimizing trebuchet designs."""
+
 from pytrebuchet.optimization import DesignOptimizer
 from pytrebuchet.projectile import Projectile
 from pytrebuchet.simulation import Simulation, SimulationPhases

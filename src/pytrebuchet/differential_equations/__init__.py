@@ -1,3 +1,5 @@
+"""Differential equations module for the pytrebuchet package."""
+
 from pytrebuchet.differential_equations.ballistic_phase import (
     ballistic_ode,
     projectile_hits_ground_event,
