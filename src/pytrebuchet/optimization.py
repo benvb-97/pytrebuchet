@@ -21,8 +21,7 @@ class Parameters(StrEnum):
 
 
 class DesignOptimizer:
-    """
-    Class to perform design optimization of a trebuchet.
+    """Class to perform design optimization of a trebuchet.
     Caches simulation results to avoid redundant computations.
 
     Note: it only supports hinged counterweight trebuchets for now, not whipper-style trebuchets.
@@ -42,8 +41,7 @@ class DesignOptimizer:
         release_angle: float | tuple[float, tuple[float, float]],
         constrain_sling_tension: bool = True,
     ) -> None:
-        """
-        Initialize the DesignOptimizer with fixed parameters and design variable bounds.
+        """Initialize the DesignOptimizer with fixed parameters and design variable bounds.
 
         :param length_arm: Length of the trebuchet arm (projectile + weight arm) (m)
         :param mass_arm: Mass of the trebuchet arm (kg)
@@ -63,7 +61,6 @@ class DesignOptimizer:
             if float, fixed value; if tuple, (initial_guess, (min, max))
         :param constrain_sling_tension: Whether to enforce sling tension constraint (sling should not go slack) during optimization (default: True)
         """
-
         self._cache = {}  # Cache to store simulation results
 
         # Store fixed parameters
@@ -108,15 +105,13 @@ class DesignOptimizer:
         local_method: str = None,
         options: dict = None,
     ) -> OptimizeResult:
-        """
-        Perform the optimization of the trebuchet design.
+        """Perform the optimization of the trebuchet design.
         :param global_optimization: Whether to use global optimization (SHGO) or local (default: False, local)
         :param method: Optimization method to use for local optimization (default: None, uses default method of scipy.optimize.minimize)
         :param options: Additional options to pass to the optimizer
 
         :return: OptimizeResult object containing optimization results
         """
-
         # Define constraints
         constraints = []
         if self._constrain_sling_tension:
@@ -147,8 +142,7 @@ class DesignOptimizer:
         return result
 
     def _get_by_name(self, x: np.ndarray, name: Parameters) -> float:
-        """
-        Get the value of a fixed parameter or design variable by its name.
+        """Get the value of a fixed parameter or design variable by its name.
 
         :param x: Array containing design variables
         :param name: Name of the design variable or fixed parameter
@@ -158,21 +152,18 @@ class DesignOptimizer:
         if name in self._vars_index_map:  # design variable
             index = self._vars_index_map[name]
             return x[index]
-        elif name in self._fixed_params:  # fixed parameter
+        if name in self._fixed_params:  # fixed parameter
             return self._fixed_params[name]
-        else:
-            raise ValueError(f"{name} not found.")
+        raise ValueError(f"{name} not found.")
 
     def _solve_simulation(self, x: np.ndarray) -> Simulation:
-        """
-        Run the simulation with given design variables.
+        """Run the simulation with given design variables.
         Caches results to avoid redundant computations.
 
         :param x: Array containing design variables
 
         :return: Simulation object with results
         """
-
         # Check if result is already cached
         key = tuple(x)
         if key in self._cache:
@@ -213,15 +204,13 @@ class DesignOptimizer:
         return simulation
 
     def _objective(self, x: np.ndarray, *args) -> float:
-        """
-        Objective function to minimize: negative horizontal distance of the projectile.
+        """Objective function to minimize: negative horizontal distance of the projectile.
 
         :param x: Array containing design variables
         :param args: tuple of fixed parameters needed for simulation
 
         :return: Negative horizontal distance traveled by the projectile
         """
-
         simulation = self._solve_simulation(x, *args)
         if simulation is None:
             return 1e6  # Large penalty for failed simulations
@@ -230,15 +219,13 @@ class DesignOptimizer:
         return -distance
 
     def _sling_tension_constraint(self, x: np.ndarray, *args) -> float:
-        """
-        Constraint function: sling must be in tension during trebuchet operation.
+        """Constraint function: sling must be in tension during trebuchet operation.
 
         :param x: Array containing design variables
         :param args: tuple of fixed parameters needed for simulation
 
         :return: minimum sling tension during trebuchet operation
         """
-
         simulation = self._solve_simulation(x, *args)
         if simulation is None:
             return -1e6  # Large negative value for failed simulations
@@ -250,12 +237,10 @@ class DesignOptimizer:
         return min_tension
 
     def get_baseline_distance(self) -> float:
-        """
-        Get the distance traveled by the projectile for the baseline design (initial guess).
+        """Get the distance traveled by the projectile for the baseline design (initial guess).
 
         :return: Horizontal distance traveled by the projectile for baseline design
         """
-
         simulation = self._solve_simulation(np.array(self._x0))
         if simulation is None:
             raise RuntimeError("Baseline simulation failed.")

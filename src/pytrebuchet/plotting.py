@@ -1,18 +1,16 @@
-import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import animation
 
-from pytrebuchet import Projectile, Simulation, Trebuchet, SimulationPhases
+from pytrebuchet import Projectile, Simulation, SimulationPhases, Trebuchet
 
 
 def plot_initial_position(trebuchet: Trebuchet, projectile: Projectile) -> None:
-    """
-    Plots the initial position of the trebuchet and the projectile.
+    """Plots the initial position of the trebuchet and the projectile.
     :param trebuchet: Trebuchet instance
     :param projectile: Projectile instance
     :return: None
     """
-
     # Create figure
     fig, ax = plt.subplots()
     limits_x, limits_y = trebuchet.get_limits()
@@ -69,15 +67,13 @@ def plot_initial_position(trebuchet: Trebuchet, projectile: Projectile) -> None:
 def animate_launch(
     simulation: Simulation, skip: int = 5, delay: float = 25, show=True
 ) -> None:
-    """
-    Animates the trebuchet launch and projectile motion using matplotlib.
+    """Animates the trebuchet launch and projectile motion using matplotlib.
     :param simulation: Simulation instance with completed run
     :param skip: Number of frames to skip for faster animation
     :param delay: Delay between frames in milliseconds
     :param show: Whether to display the animation immediately
     :return: None
     """
-
     if not simulation.solved:
         raise ValueError("Simulation has not been run yet.")
     trebuchet = simulation.trebuchet

@@ -8,8 +8,7 @@ def ballistic_ode(
     y,
     *args,
 ):
-    """
-    Represents the ordinary differential equations (ODEs) for a ballistic projectile after release from the sling.
+    """Represents the ordinary differential equations (ODEs) for a ballistic projectile after release from the sling.
 
     :param t: time variable (not used in this function but required for ODE solvers)
 
@@ -33,7 +32,6 @@ def ballistic_ode(
     :return: derivatives: tuple containing the derivatives of the state variables:
              (vx, vy, ax, ay)
     """
-
     # Fetch variables
     wind_speed, rho, nu, g, _ = args
     projectile: Projectile = args[-1]
@@ -68,8 +66,7 @@ def projectile_hits_ground_event(
     y,
     *args,
 ):
-    """
-    Represents the event function to determine when the projectile hits the ground.
+    """Represents the event function to determine when the projectile hits the ground.
     The event occurs when the vertical position of the projectile (py) reaches zero.
 
     :param t: time variable (not used in this function but required for ODE solvers)
@@ -102,8 +99,7 @@ def calculate_reynolds_number(
     diameter: float,
     air_kinematic_viscosity: float,
 ) -> float:
-    """
-    Calculates the Reynolds number for a (spherical) projectile.
+    """Calculates the Reynolds number for a (spherical) projectile.
 
     :param velocity: Velocity of the projectile (m/s)
     :param diameter: Diameter of the projectile (m)

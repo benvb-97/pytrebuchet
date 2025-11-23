@@ -7,12 +7,10 @@ from pytrebuchet import Trebuchet
 def init_hcw_trebuchet(
     projectile_touch_ground: bool = True,
 ) -> Trebuchet:
-    """
-    Initializes a hinged counterweight Trebuchet instance with predefined parameters for testing.
+    """Initializes a hinged counterweight Trebuchet instance with predefined parameters for testing.
     :param projectile_touch_ground: If True, sets the parameters so that the projectile arm touches the ground.
     :return: Trebuchet instance
     """
-
     if projectile_touch_ground:
         h_pivot = 5.0
     else:

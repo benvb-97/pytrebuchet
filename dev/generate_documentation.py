@@ -1,6 +1,4 @@
-"""
-Generates the documentation for the pytrebuchet project using Sphinx.
-"""
+"""Generates the documentation for the pytrebuchet project using Sphinx."""
 
 if __name__ == "__main__":
     import os

@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from math import pi
-from typing import Callable
 
 from pytrebuchet.drag_coefficient import (
     drag_coefficient_smooth_sphere_clift_grace_weber,
@@ -7,8 +7,7 @@ from pytrebuchet.drag_coefficient import (
 
 
 class Projectile:
-    """
-    Represents a projectile launched by the trebuchet.
+    """Represents a projectile launched by the trebuchet.
     It assumes a spherical shape for drag calculations.
     """
 
@@ -18,8 +17,7 @@ class Projectile:
         diameter: float,
         drag_coefficient: float | Callable = None,
     ):
-        """
-        Initializes a Projectile instance. It assumes a spherical shape for drag calculations.
+        """Initializes a Projectile instance. It assumes a spherical shape for drag calculations.
         :param mass: mass of the projectile (kg)
         :param diameter: diameter of the projectile (m)
         :param drag_coefficient: drag coefficient (dimensionless)
@@ -28,7 +26,6 @@ class Projectile:
                         The function should be vectorized to handle numpy arrays.
             - None: uses default drag coefficient calculation for smooth sphere
         """
-
         self.mass = mass
         self.diameter = diameter
 
@@ -43,7 +40,5 @@ class Projectile:
 
     @classmethod
     def default(cls) -> "Projectile":
-        """
-        Creates a projectile with default parameters used by https://virtualtrebuchet.com (pumpkin).
-        """
+        """Creates a projectile with default parameters used by https://virtualtrebuchet.com (pumpkin)."""
         return cls(mass=4, diameter=0.35)

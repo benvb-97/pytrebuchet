@@ -1,8 +1,7 @@
-from pytrebuchet.projectile import Projectile
-
 from pytrebuchet.drag_coefficient import (
     drag_coefficient_smooth_sphere_clift_grace_weber,
 )
+from pytrebuchet.projectile import Projectile
 
 
 class TestProjectile:

@@ -1,6 +1,7 @@
+import warnings
+
 import numpy as np
 import pytest
-import warnings
 
 from pytrebuchet.drag_coefficient import (
     drag_coefficient_smooth_sphere_clift_grace_weber,

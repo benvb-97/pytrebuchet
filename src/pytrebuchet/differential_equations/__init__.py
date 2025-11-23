@@ -19,16 +19,15 @@ from pytrebuchet.differential_equations.whipper_projectile_constrained_phase imp
     whipper_projectile_separation_event,
 )
 
-
 __all__ = [
     "ballistic_ode",
-    "projectile_hits_ground_event",
     "ground_separation_event",
-    "sliding_projectile_ode",
+    "projectile_hits_ground_event",
     "projectile_release_event",
+    "sliding_projectile_ode",
     "sling_projectile_ode",
     "whipper_both_constrained_ode",
-    "whipper_weight_separation_event",
     "whipper_projectile_constrained_ode",
     "whipper_projectile_separation_event",
+    "whipper_weight_separation_event",
 ]

@@ -7,8 +7,7 @@ def whipper_both_constrained_ode(
     y,
     *args,
 ):
-    """
-    Represents the ordinary differential equations (ODEs) for a whipper trebuchet with both the weight and projectile constrained by the arm.
+    """Represents the ordinary differential equations (ODEs) for a whipper trebuchet with both the weight and projectile constrained by the arm.
     :param t: time variable (not used in this function but required for ODE solvers)
 
     :param y: tuple containing the state variables:
@@ -38,7 +37,6 @@ def whipper_both_constrained_ode(
 
     :return: derivatives: tuple containing the derivatives of the state variables: (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
-
     # Fetch variables
     theta, phi, psi, dtheta, dphi, dpsi = (
         y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
@@ -88,8 +86,7 @@ def whipper_weight_separation_event(
     y,
     *args,
 ):
-    """
-    The weight separates when the unconstrained angular accelerations of the weight and arm result in an increasing angle between them.
+    """The weight separates when the unconstrained angular accelerations of the weight and arm result in an increasing angle between them.
     This event function returns the difference in angular accelerations (ddphi - ddtheta).
     :param t: time variable (not used in this function but required for ODE solvers)
 
@@ -120,7 +117,6 @@ def whipper_weight_separation_event(
 
     :return: lambd: the lagrange multiplier, representing the normal force at the ground contact point
     """
-
     # Fetch variables
     theta, phi, psi, dtheta, dphi, dpsi = (
         y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling

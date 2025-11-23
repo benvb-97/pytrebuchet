@@ -1,5 +1,4 @@
-"""
-Small script to quickly reformat all project files using the 'black' and 'isort' package.
+"""Small script to quickly reformat all project files using the 'black' and 'isort' package.
 
 You should install black/isort using pip install to your main python installation if you'd like to use this code.
 Black/isort is not a requirement for the main code to run.

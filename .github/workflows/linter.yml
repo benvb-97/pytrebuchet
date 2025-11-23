@@ -1,8 +1,8 @@
 name: Linter
 on: [push, pull_request]
 jobs:
-  
-  # Run Ruff linter 
+
+  # Run Ruff linter
   ruff:
     name: Ruff Linter
     runs-on: ubuntu-latest

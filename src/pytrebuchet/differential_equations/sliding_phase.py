@@ -7,8 +7,7 @@ def sliding_projectile_ode(
     y,
     *args,
 ):
-    """
-    Represents the ordinary differential equations (ODEs) for a trebuchet with a projectile sliding over the ground.
+    """Represents the ordinary differential equations (ODEs) for a trebuchet with a projectile sliding over the ground.
     :param t: time variable (not used in this function but required for ODE solvers)
 
     :param y: tuple containing the state variables:
@@ -38,7 +37,6 @@ def sliding_projectile_ode(
 
     :return: derivatives: tuple containing the derivatives of the state variables: (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
-
     # Fetch variables
     theta, phi, psi, dtheta, dphi, dpsi = (
         y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
@@ -88,8 +86,7 @@ def ground_separation_event(
     y,
     *args,
 ):
-    """
-    Calculates the lagrange multiplier for the ground separation event in a trebuchet with a sliding projectile.
+    """Calculates the lagrange multiplier for the ground separation event in a trebuchet with a sliding projectile.
     When the lagrange multiplier becomes zero, the projectile separates from the ground.
 
     :param t: time variable (not used in this function but required for ODE solvers)
@@ -121,7 +118,6 @@ def ground_separation_event(
 
     :return: lambd: the lagrange multiplier, representing the normal force at the ground contact point
     """
-
     # Fetch variables
     theta, phi, psi, dtheta, dphi, dpsi = (
         y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling

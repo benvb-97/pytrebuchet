@@ -5,8 +5,7 @@ from numpy import cos, sin
 
 
 class Trebuchet:
-    """
-    Class representing a trebuchet
+    """Class representing a trebuchet
 
     The trebuchet's position is defined by three angles:
     - angle_arm: angle of the arm with respect to the horizontal (radians)
@@ -28,8 +27,7 @@ class Trebuchet:
         d_pivot_to_arm_cog: float = None,
         configuration: str = "hcw",
     ) -> None:
-        """
-        :param l_weight_arm: length of the arm positioned between the pivot and the weight. units: m
+        """:param l_weight_arm: length of the arm positioned between the pivot and the weight. units: m
         :param l_projectile_arm: length of the arm positioned between the pivot and the projectile. units: m
         :param l_sling_projectile: length of the sling to which the projectile is attached. units: m
         :param l_sling_weight: length of the sling to which the weight is attached. units: m
@@ -43,7 +41,6 @@ class Trebuchet:
             A whipper trebuchet features a hinged counterweight system, but with the counterweight hanger positioned at the top of the throwing arm.
             When cocked, the arm points forward in the direction of the throw. At the start, the weight and projectile 'rest' on the trebuchet arm.
         """
-
         self.l_weight_arm = l_weight_arm
         self.l_projectile_arm = l_projectile_arm
         self.l_sling_projectile = l_sling_projectile
@@ -102,8 +99,7 @@ class Trebuchet:
         )
 
     def _calculate_initial_angles_hcw(self) -> None:
-        """
-        Calculates the initial angles of the trebuchet (arm, projectile sling and weight sling) at the starting position.
+        """Calculates the initial angles of the trebuchet (arm, projectile sling and weight sling) at the starting position.
 
         Calculate:
          -angle_arm such that the projectile arm end just touches the ground. If the arm is too short to reach the ground, set a default angle of 55 degrees.
@@ -111,7 +107,6 @@ class Trebuchet:
          -angle_projectile such that the projectile just touches the ground. If the sling is too short to reach the ground,
           set the sling angle such that it hangs vertically downwards.
         """
-
         # Arm angle
         if (
             self.h_pivot >= self.l_projectile_arm
@@ -138,15 +133,13 @@ class Trebuchet:
             )
 
     def _calculate_initial_angles_whipper(self) -> None:
-        """
-        Calculates the initial angles of the trebuchet (arm, projectile sling and weight sling) at the starting position for a whipper trebuchet.
+        """Calculates the initial angles of the trebuchet (arm, projectile sling and weight sling) at the starting position for a whipper trebuchet.
 
         Calculate:
          -angle_arm such that the projectile arm end points upwards at a 45 degree angle in the direction of the launch.
          -angle_weight such that the weight points upwards at a 55 degree angle in the direction of the launch.
          -angle_projectile such that the projectile points downwards at a 45 degree angle in the direction opposite to the launch.,
         """
-
         self.init_angle_arm = (180 + 45) * np.pi / 180.0
         self.init_angle_weight = (-270 - 30) * np.pi / 180.0
         self.init_angle_projectile = (-90 - 50) * np.pi / 180.0
@@ -155,13 +148,11 @@ class Trebuchet:
     def calculate_arm_endpoint_projectile(
         self, angle_arm: float | np.ndarray[float]
     ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
-        """
-        Calculates the x, y coordinates of the arm endpoint attached to the projectile sling based on the given arm angle.
+        """Calculates the x, y coordinates of the arm endpoint attached to the projectile sling based on the given arm angle.
 
         :param angle_arm: angle of the arm (radians)
         :return: x, y coordinates of the projectile arm endpoint, respectively
         """
-
         x_arm_projectile = -self.l_projectile_arm * cos(angle_arm)
         y_arm_projectile = self.h_pivot - self.l_projectile_arm * sin(angle_arm)
 
@@ -176,13 +167,11 @@ class Trebuchet:
     def calculate_arm_endpoint_weight(
         self, angle_arm: float | np.ndarray[float]
     ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
-        """
-        Calculates the x, y coordinates of arm endpoint attached to the weight sling based on the given arm angle.
+        """Calculates the x, y coordinates of arm endpoint attached to the weight sling based on the given arm angle.
 
         :param angle_arm: angle of the arm (radians)
         :return: x, y coordinates of the weight arm endpoint, respectively
         """
-
         x_arm_weight = self.l_weight_arm * cos(angle_arm)
         y_arm_weight = self.h_pivot + self.l_weight_arm * sin(angle_arm)
 
@@ -199,13 +188,11 @@ class Trebuchet:
         angle_arm: float | np.ndarray[float],
         angle_weight: float | np.ndarray[float],
     ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
-        """
-        Calculates the x, y coordinates of the weight point based on the given arm endpoint and weight sling angle.
+        """Calculates the x, y coordinates of the weight point based on the given arm endpoint and weight sling angle.
         :param angle_arm: angle of the arm (radians)
         :param angle_weight: angle of the weight sling (radians)
         :return: x, y coordinates of the weight point
         """
-
         x_arm_weight, y_arm_weight = self.calculate_arm_endpoint_weight(angle_arm)
 
         x_weight = x_arm_weight + cos(angle_weight) * self.l_sling_weight
@@ -218,13 +205,11 @@ class Trebuchet:
         angle_arm: float | np.ndarray[float],
         angle_projectile: float | np.ndarray[float],
     ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
-        """
-        Calculates the x, y coordinates of the projectile point based on the given arm endpoint and projectile angle.
+        """Calculates the x, y coordinates of the projectile point based on the given arm endpoint and projectile angle.
         :param angle_arm: angle of the arm (radians)
         :param angle_projectile: angle of the projectile (radians)
         :return: x, y coordinates of the projectile point
         """
-
         x_arm_projectile, y_arm_projectile = self.calculate_arm_endpoint_projectile(
             angle_arm
         )
@@ -251,15 +236,13 @@ class Trebuchet:
         angular_velocity_arm: float | np.ndarray[float],
         angular_velocity_projectile: float | np.ndarray[float],
     ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
-        """
-        Calculates the x, y components of the projectile velocity based on the given arm and projectile angles and angular velocities.
+        """Calculates the x, y components of the projectile velocity based on the given arm and projectile angles and angular velocities.
         :param angle_arm: angle of the arm (radians)
         :param angle_projectile: angle of the projectile (radians)
         :param angular_velocity_arm: angular velocity of the arm (radians/s)
         :param angular_velocity_projectile: angular velocity of the projectile sling (radians/s)
         :return: x, y components of the projectile velocity
         """
-
         vx = self.l_projectile_arm * angular_velocity_arm * sin(
             angle_arm
         ) - self.l_sling_projectile * angular_velocity_projectile * sin(
@@ -283,8 +266,7 @@ class Trebuchet:
         angular_acceleration_arm: float | np.ndarray[float],
         angular_acceleration_projectile: float | np.ndarray[float],
     ) -> tuple[float | np.ndarray[float], float | np.ndarray[float]]:
-        """
-        Calculates the x, y components of the projectile acceleration based on the given arm and projectile angles, angular velocities and angular accelerations.
+        """Calculates the x, y components of the projectile acceleration based on the given arm and projectile angles, angular velocities and angular accelerations.
 
         :param angle_arm: angle of the arm (radians)
         :param angle_projectile: angle of the projectile (radians)
@@ -295,7 +277,6 @@ class Trebuchet:
 
         :return: x, y components of the projectile acceleration
         """
-
         theta, psi, dtheta, dpsi, ddtheta, ddpsi = (
             angle_arm,
             angle_projectile,
@@ -323,16 +304,13 @@ class Trebuchet:
 
     # Plotting functions
     def get_limits(self) -> tuple[tuple[float, float], tuple[float, float]]:
-        """
-        Returns the maximum x- and y- positions that the points making up the trebuchet can take for plotting.
+        """Returns the maximum x- and y- positions that the points making up the trebuchet can take for plotting.
         :return: (x_min, x_max), (y_min, y_max)
         """
         projectile_length = self.l_projectile_arm + self.l_sling_projectile
         weight_length = self.l_weight_arm + self.l_sling_weight
 
-        max_length = (
-            projectile_length if projectile_length > weight_length else weight_length
-        )
+        max_length = max(weight_length, projectile_length)
 
         x_min = -max_length
         x_max = max_length

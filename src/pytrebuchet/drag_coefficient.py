@@ -6,15 +6,13 @@ import numpy as np
 def drag_coefficient_smooth_sphere_clift_grace_weber(
     reynolds_number: float | np.ndarray[float],
 ) -> float | np.ndarray[float]:
-    """
-    Calculates the drag coefficient for a smooth sphere based on the Reynolds number.
+    """Calculates the drag coefficient for a smooth sphere based on the Reynolds number.
 
     Source: Clift, Grace, and Weber (Bubbles, Drops, and Particles, Academic Press, 1978)
 
     :param reynolds_number: Reynolds number of the sphere
     :return: drag coefficient of the sphere (dimensionless)
     """
-
     # Cast to numpy array for vectorized operations
     if type(reynolds_number) is float:
         is_float = True
@@ -97,8 +95,7 @@ def drag_coefficient_smooth_sphere_clift_grace_weber(
 def drag_coefficient_smooth_sphere_morrison(
     reynolds_number: float | np.ndarray[float],
 ) -> float | np.ndarray[float]:
-    """
-    Calculates the drag coefficient for a smooth sphere based on the Reynolds number.
+    """Calculates the drag coefficient for a smooth sphere based on the Reynolds number.
 
     Source: Data Correlation for Drag Coefficient for Sphere Faith A. Morrison,
     Department of Chemical Engineering Michigan Technological University, Houghton, MI 49931
@@ -106,7 +103,6 @@ def drag_coefficient_smooth_sphere_morrison(
     :param reynolds_number: Reynolds number of the sphere
     :return: drag coefficient of the sphere (dimensionless)
     """
-
     # Correlation is valid for Reynolds numbers between 0.1 and 1e6, consider 0.01 to 1e7 to be safe
     if isinstance(reynolds_number, float):
         if not (reynolds_number >= 0.01 and reynolds_number <= 1e7):

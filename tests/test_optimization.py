@@ -1,4 +1,5 @@
 from math import pi
+
 import pytest
 
 from pytrebuchet import DesignOptimizer
@@ -8,15 +9,13 @@ from pytrebuchet.optimization import Parameters
 def init_optimizer(
     constrain_sling_tension: bool = True, incorrect_input: bool = False
 ) -> DesignOptimizer:
-    """
-    Initializes a DesignOptimizer instance with predefined parameters for testing.
+    """Initializes a DesignOptimizer instance with predefined parameters for testing.
 
     :param constrain_sling_tension: Whether to enforce sling tension constraint
     :param incorrect_input: Whether to use incorrect input types for testing
 
     :return: DesignOptimizer instance
     """
-
     if incorrect_input:
         fraction_projectile_arm = "test"
         length_sling_projectile = {"invalid": "length"}
@@ -84,9 +83,7 @@ class TestDesignOptimizer:
         assert optimizer._constrain_sling_tension is False
 
     def test_incorrect_inputs(self):
-        """
-        Verify that incorrect inputs raise appropriate exceptions.
-        """
+        """Verify that incorrect inputs raise appropriate exceptions."""
         with pytest.raises(ValueError):
             init_optimizer(incorrect_input=True)
 
@@ -107,8 +104,9 @@ class TestDesignOptimizer:
         assert 0.5 <= fraction_projectile_arm_opt <= 0.9
         assert 1.0 <= length_sling_projectile_opt <= 10.0
         assert 25 * pi / 180 <= release_angle_opt <= 60 * pi / 180
-        
+
         # Verify optimization improved the design (negative objective = better distance)
         optimized_distance = -optimizer._objective(result.x)
-        assert optimized_distance > optimizer.get_baseline_distance(), \
+        assert optimized_distance > optimizer.get_baseline_distance(), (
             "Optimization should improve throwing distance"
+        )

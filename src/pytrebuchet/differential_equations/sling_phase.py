@@ -7,8 +7,7 @@ def sling_projectile_ode(
     y,
     *args,
 ):
-    """
-    Represents the ordinary differential equations (ODEs) for a trebuchet with a projectile that is unconstrained by the ground, but still in the sling.
+    """Represents the ordinary differential equations (ODEs) for a trebuchet with a projectile that is unconstrained by the ground, but still in the sling.
 
     :param t: time variable (not used in this function but required for ODE solvers)
 
@@ -39,7 +38,6 @@ def sling_projectile_ode(
 
     :return: derivatives: tuple containing the derivatives of the state variables: (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
-
     # Fetch variables
     theta, phi, psi, dtheta, dphi, dpsi = (
         y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
@@ -85,8 +83,7 @@ def projectile_release_event(
     y,
     *args,
 ):
-    """
-    Event function to determine when the projectile releases from the sling (when the velocity angle matches the desired release angle).
+    """Event function to determine when the projectile releases from the sling (when the velocity angle matches the desired release angle).
 
     :param t: time variable (not used in this function but required for ODE solvers)
     :param y: tuple containing the state variables:
@@ -114,7 +111,6 @@ def projectile_release_event(
         release_angle: desired release angle of the projectile
     :return: event_value: difference between the current velocity angle and the desired release angle
     """
-
     # Fetch variables
     theta, phi, psi, dtheta, dphi, dpsi = (
         y  # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
