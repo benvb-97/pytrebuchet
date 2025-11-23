@@ -124,6 +124,8 @@ class Simulation:
         """
         self.trebuchet = trebuchet
         self.projectile = projectile
+        if environment is None:
+            environment = EnvironmentConfig()
         self.environment = environment
 
         self._verify_sling_tension = verify_sling_tension

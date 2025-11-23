@@ -95,11 +95,8 @@ def test_incorrect_inputs() -> None:
         )
 
 
-def test_optimize(optimizer: DesignOptimizer, optimizer_params: list[bool]) -> None:
+def test_optimize(optimizer: DesignOptimizer) -> None:
     """Test the optimization process of the DesignOptimizer."""
-    constrain_sling_tension: bool = optimizer_params[0]
-    if not constrain_sling_tension:
-        return  # Skip further checks if no constraints are applied
     result = optimizer.optimize()
 
     # Check that optimization was successful
