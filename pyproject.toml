@@ -58,6 +58,7 @@ extend-ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "PLR2004", "INP001", "SLF001"]
 "dev/*" = ["ALL"]
+"examples/*" = ["ALL"]
 
 [tool.ruff.lint.pylint]
 max-args = 7  # Increase the maximum number of arguments allowed in a function
