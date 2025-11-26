@@ -177,38 +177,6 @@ class Simulation:
             msg = "Sling goes slack during the simulation."
             warnings.warn(msg, stacklevel=1)
 
-    def _get_args_trebuchet_phases(self) -> tuple[float, ...]:
-        """Return the arguments for the trebuchet phases differential equations.
-
-        The differential equations have the following constants:
-        l1: length of the arm from pivot to weight attachment point
-        l2: length of the arm from pivot to projectile attachment point
-        l3: length of the sling to which the projectile is attached
-        l4: length of the sling to which the weight is attached
-        la: distance from the pivot to the arm's center of gravity
-        Ia: inertia of the arm
-        m1: mass of the weight
-        m2: mass of the projectile
-        ma: mass of the arm
-        g: gravitational acceleration
-        release_angle: angle at which the projectile is released from the sling
-
-        :return: Tuple of arguments for the trebuchet phases ODEs.
-        """
-        return (
-            self.trebuchet.l_weight_arm,
-            self.trebuchet.l_projectile_arm,
-            self.trebuchet.l_sling_projectile,
-            self.trebuchet.l_sling_weight,
-            self.trebuchet.d_pivot_to_arm_cog,
-            self.trebuchet.inertia_arm,
-            self.trebuchet.mass_weight,
-            self.projectile.mass,
-            self.trebuchet.mass_arm,
-            self.environment.gravitational_acceleration,
-            self.trebuchet.release_angle,
-        )
-
     def _solve_trebuchet_phase(self, phase_index: int) -> None:
         """Solve the differential equations for a specific trebuchet phase.
 
@@ -250,7 +218,7 @@ class Simulation:
             fun=phase_to_ode_map[phase],
             t_span=t_span,
             y0=y0,
-            args=self._get_args_trebuchet_phases(),
+            args=(self.trebuchet, self.projectile, self.environment),
             t_eval=t_eval,
             events=event,
             atol=self._atol,
@@ -444,10 +412,10 @@ class Simulation:
 
                 # Calculate angular accelerations at each time step
                 acc_variables = np.zeros((variables_phase.shape[0], 3))
-
+                args = (self.trebuchet, self.projectile, self.environment)
                 for i in range(t_steps.size):
                     acc_variables[i, :] = phase_to_ode_map[phase](
-                        None, variables_phase[i, :], *self._get_args_trebuchet_phases()
+                        None, variables_phase[i, :], *args
                     )[3:]
 
                 # Concatenate accelerations to state variables
@@ -578,10 +546,10 @@ class Simulation:
             if calculate_accelerations:
                 # Calculate angular accelerations at each time step
                 acc_ballistic = np.zeros((t_ballistic.size, 3))
-
+                args = (self.environment, self.projectile)
                 for i in range(t_ballistic.size):
                     acc_ballistic[i, :] = ballistic_ode(
-                        None, projectile_vars[i, :4], *self._get_args_ballistic_phase()
+                        None, projectile_vars[i, :4], *args
                     )[2:]
 
                 # Concatenate accelerations to state variables

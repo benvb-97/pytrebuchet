@@ -1,3 +1,5 @@
+"""Module for plotting trebuchet simulations using matplotlib."""
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
@@ -6,13 +8,14 @@ from pytrebuchet import Projectile, Simulation, SimulationPhases, Trebuchet
 
 
 def plot_initial_position(trebuchet: Trebuchet, projectile: Projectile) -> None:
-    """Plots the initial position of the trebuchet and the projectile.
+    """Plot the initial position of the trebuchet and the projectile.
+
     :param trebuchet: Trebuchet instance
     :param projectile: Projectile instance
     :return: None
     """
     # Create figure
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     limits_x, limits_y = trebuchet.get_limits()
     ax.set_xlim(limits_x[0], limits_x[1])
     ax.set_ylim(limits_y[0], limits_y[1])
@@ -33,16 +36,10 @@ def plot_initial_position(trebuchet: Trebuchet, projectile: Projectile) -> None:
 
     # Plot lines between trebuchet points
     ax.plot([0.0, 0.0], [0.0, trebuchet.h_pivot], c="black")  # pivot line
-    (line_arm_projectile,) = ax.plot(
-        [0.0, x_arm_projectile], [trebuchet.h_pivot, y_arm_projectile], c="red"
-    )
-    (line_arm_weight,) = ax.plot(
-        [0.0, x_arm_weight], [trebuchet.h_pivot, y_arm_weight], c="green"
-    )
-    (line_weight,) = ax.plot(
-        [x_arm_weight, x_weight], [y_arm_weight, y_weight], c="blue"
-    )
-    (line_projectile,) = ax.plot(
+    ax.plot([0.0, x_arm_projectile], [trebuchet.h_pivot, y_arm_projectile], c="red")
+    ax.plot([0.0, x_arm_weight], [trebuchet.h_pivot, y_arm_weight], c="green")
+    ax.plot([x_arm_weight, x_weight], [y_arm_weight, y_weight], c="blue")
+    ax.plot(
         [x_arm_projectile, x_projectile], [y_arm_projectile, y_projectile], c="orange"
     )
 
@@ -65,9 +62,10 @@ def plot_initial_position(trebuchet: Trebuchet, projectile: Projectile) -> None:
 
 
 def animate_launch(
-    simulation: Simulation, skip: int = 5, delay: float = 25, show=True
+    simulation: Simulation, skip: int = 5, delay: float = 25, *, show: bool = True
 ) -> None:
-    """Animates the trebuchet launch and projectile motion using matplotlib.
+    """Animate the trebuchet launch and projectile motion using matplotlib.
+
     :param simulation: Simulation instance with completed run
     :param skip: Number of frames to skip for faster animation
     :param delay: Delay between frames in milliseconds
@@ -75,7 +73,8 @@ def animate_launch(
     :return: None
     """
     if not simulation.solved:
-        raise ValueError("Simulation has not been run yet.")
+        msg = "Simulation has not been run yet."
+        raise ValueError(msg)
     trebuchet = simulation.trebuchet
     projectile = simulation.projectile
 
@@ -133,7 +132,7 @@ def animate_launch(
         label="Projectile Trajectory",
     )
 
-    def update(frame):
+    def update(frame: int) -> animation.FuncAnimation:
         if frame < tsteps_trebuchet.size:  # Animate both trebuchet and projectile
             line_arm_projectile.set_data(
                 [0.0, x_arm_projectile[frame]],

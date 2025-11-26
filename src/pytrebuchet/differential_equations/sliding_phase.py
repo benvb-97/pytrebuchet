@@ -1,13 +1,22 @@
 """Module containing the differential equations for a sliding projectile."""
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from numpy import cos, sin
+
+if TYPE_CHECKING:
+    from pytrebuchet.environment import EnvironmentConfig
+    from pytrebuchet.projectile import Projectile
+    from pytrebuchet.trebuchet import Trebuchet
 
 
 def sliding_projectile_ode(
     t: float,
     y: tuple[float, float, float, float, float, float],
-    *args: tuple,
+    trebuchet: "Trebuchet",
+    projectile: "Projectile",
+    environment: "EnvironmentConfig",
 ) -> tuple[float, float, float, float, float, float]:
     """Ordinary differential equations (ODEs) for a projectile sliding over the ground.
 
@@ -21,30 +30,28 @@ def sliding_projectile_ode(
         dtheta: angular velocity of the arm
         dphi: angular velocity of the weight
         dpsi: angular velocity of the projectile
-    :param args: additional parameters required for the equations:
-        (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
-        where:
-        l1: length of the arm from pivot to weight attachment point
-        l2: length of the arm from pivot to projectile attachment point
-        l3: length of the sling to which the projectile is attached
-        l4: length of the sling to which the weight is attached
-        la: distance from the pivot to the arm's center of gravity
-        Ia: inertia of the arm
-        m1: mass of the weight
-        m2: mass of the projectile
-        ma: mass of the arm
-        g: gravitational acceleration
-        release_angle: angle at which the projectile is released
+    :param trebuchet: Trebuchet object containing trebuchet parameters
+    :param projectile: Projectile object containing projectile parameters
+    :param environment: EnvironmentConfig object containing environmental parameters
 
     :return: derivatives:
     tuple containing the derivatives of the state variables:
      (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
-    _ = t  # Unused variable
-
-    # Fetch variables, arm, weight, sling
+    # Fetch variables
+    _ = t  # time variable not used
+    # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
     theta, phi, psi, dtheta, dphi, dpsi = y
-    l1, l2, l3, l4, la, inertia_a, m1, m2, ma, g, _ = args
+    l1 = trebuchet.l_weight_arm
+    l2 = trebuchet.l_projectile_arm
+    l3 = trebuchet.l_sling_projectile
+    l4 = trebuchet.l_sling_weight
+    la = trebuchet.d_pivot_to_arm_cog
+    inertia_a = trebuchet.inertia_arm
+    m1 = trebuchet.mass_weight
+    m2 = projectile.mass
+    ma = trebuchet.mass_arm
+    g = environment.gravitational_acceleration
 
     # Calculate terms
     I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + inertia_a  # noqa: N806
@@ -87,7 +94,9 @@ def sliding_projectile_ode(
 def ground_separation_event(
     t: float,
     y: tuple[float, float, float, float, float, float],
-    *args: tuple,
+    trebuchet: "Trebuchet",
+    projectile: "Projectile",
+    environment: "EnvironmentConfig",
 ) -> float:
     """Calculate lagrange multiplier for the ground separation event.
 
@@ -103,31 +112,29 @@ def ground_separation_event(
         dtheta: angular velocity of the arm
         dphi: angular velocity of the weight
         dpsi: angular velocity of the projectile
-    :param args: additional parameters required for the equations:
-        (l1, l2, l3, l4, la, Ia, m1, m2, ma, g)
-        where:
-        l1: length of the arm from pivot to weight attachment point
-        l2: length of the arm from pivot to projectile attachment point
-        l3: length of the sling to which the projectile is attached
-        l4: length of the sling to which the weight is attached
-        la: distance from the pivot to the arm's center of gravity
-        Ia: inertia of the arm
-        m1: mass of the weight
-        m2: mass of the projectile
-        ma: mass of the arm
-        g: gravitational acceleration
-        release_angle: angle at which the projectile is released
+    :param trebuchet: Trebuchet object containing trebuchet parameters
+    :param projectile: Projectile object containing projectile parameters
+    :param environment: EnvironmentConfig object containing environmental parameters
 
     :return: lambd: the lagrange multiplier
     """
-    _ = t  # Unused variable
-
-    # Fetch variables: arm, weight, sling
+    # Fetch variables
+    _ = t  # time variable not used
+    # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
     theta, phi, psi, dtheta, dphi, dpsi = y
-    l1, l2, l3, l4, la, Ia, m1, m2, ma, g, _ = args  # noqa: N806
+    l1 = trebuchet.l_weight_arm
+    l2 = trebuchet.l_projectile_arm
+    l3 = trebuchet.l_sling_projectile
+    l4 = trebuchet.l_sling_weight
+    la = trebuchet.d_pivot_to_arm_cog
+    inertia_a = trebuchet.inertia_arm
+    m1 = trebuchet.mass_weight
+    m2 = projectile.mass
+    ma = trebuchet.mass_arm
+    g = environment.gravitational_acceleration
 
     # Calculate terms
-    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + Ia  # noqa: N806
+    I0 = m1 * l1**2 + m2 * l2**2 + ma * la**2 + inertia_a  # noqa: N806
     I1 = m1 * l4**2  # noqa: N806
     I2 = m2 * l3**2  # noqa: N806
     I14 = m1 * l1 * l4  # noqa: N806
