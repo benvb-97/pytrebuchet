@@ -14,11 +14,9 @@ def clift_grace_weber(
 
     ref: Clift, Grace, and Weber (Bubbles, Drops, and Particles, Academic Press, 1978)
 
-    Args:
-        reynolds_number: Reynolds number of the sphere (dimensionless)
+    :param reynolds_number: Reynolds number of the sphere (dimensionless)
 
-    Returns:
-        drag coefficient of the sphere (dimensionless)
+    :return: drag coefficient of the sphere (dimensionless)
 
     """
     # Cast to numpy array for vectorized operations
@@ -114,11 +112,9 @@ def morrison(
     The correlation is valid for Reynolds numbers between 0.1 and 1e6.
     If the input Reynolds number is outside this range, a warning is issued.
 
-    Args:
-        reynolds_number: Reynolds number of the sphere
+    :param reynolds_number: Reynolds number of the sphere
 
-    Returns:
-        drag coefficient of the sphere (dimensionless)
+    :return: drag coefficient of the sphere (dimensionless)
 
     """
     # Correlation is valid for Reynolds numbers between 0.1 and 1e6
