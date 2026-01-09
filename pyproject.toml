@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools >= 66.0.0",
+            "wheel",
+            ]
+
+[project]
+name = "pytrebuchet"
+version = "0.1.0"
+description = "A Python package to simulate trebuchet mechanics."
+readme = "README.md"
+requires-python = ">=3.13"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Ben Van Bavel"},
+]
+
+keywords = ["trebuchet", "simulation", "physics"]
+
+classifiers = [
+    "Intended Audience :: Science/Research",
+    'Operating System :: OS Independent',
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+dependencies = [
+    "numpy>=2.3.4",
+    "scipy>=1.16.3",
+    "matplotlib>=3.10.7",
+    "sympy>=1.14.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=4.4.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.4",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.ruff.lint]
+select = ["ALL"]
+extend-ignore = [
+    "D203",  # 1 blank line required before class docstring, conflicts with D202
+    "D213",  # Multi-line docstring summary should start at the second line, conflicts with D212
+    "COM812",  # Missing trailing comma in a multi-line collection, conflicts with formatter
+]
+
+[project.urls]
+Homepage = "https://github.com/benvb-97/pytrebuchet"
+Repository = "https://github.com/benvb-97/pytrebuchet"
