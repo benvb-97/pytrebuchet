@@ -49,6 +49,14 @@ class Projectile:
         else:
             self.drag_coefficient = drag_coefficient
 
+    @classmethod
+    def default(cls) -> "Projectile":
+        """Create a Projectile instance with default parameters.
+
+        :return: Projectile instance with default mass, diameter, and drag coefficient
+        """
+        return cls(mass=3.0, diameter=0.2, drag_coefficient=clift_grace_weber)
+
     @property
     def radius(self) -> float:
         """Get the radius of the spherical projectile.
