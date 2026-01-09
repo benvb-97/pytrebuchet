@@ -122,10 +122,16 @@ def morrison(
 
     """
     # Correlation is valid for Reynolds numbers between 0.1 and 1e6
-    min_re = reynolds_number \
-        if isinstance(reynolds_number, float) else np.min(reynolds_number)
-    max_re = reynolds_number \
-        if isinstance(reynolds_number, float) else np.max(reynolds_number)
+    min_re = (
+        reynolds_number
+        if isinstance(reynolds_number, float)
+        else np.min(reynolds_number)
+    )
+    max_re = (
+        reynolds_number
+        if isinstance(reynolds_number, float)
+        else np.max(reynolds_number)
+    )
 
     if (min_re < 0.1) | (max_re > 1e6):  # noqa: PLR2004
         warnings.warn(
