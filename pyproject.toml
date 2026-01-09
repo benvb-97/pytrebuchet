@@ -50,6 +50,9 @@ extend-ignore = [
     "COM812",  # Missing trailing comma in a multi-line collection, conflicts with formatter
 ]
 
+[tool.ruff.lint.pylint]
+max-args = 7  # Increase the maximum number of arguments allowed in a function
+
 [project.urls]
 Homepage = "https://github.com/benvb-97/pytrebuchet"
 Repository = "https://github.com/benvb-97/pytrebuchet"
