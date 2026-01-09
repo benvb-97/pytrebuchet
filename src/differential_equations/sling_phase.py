@@ -180,7 +180,7 @@ def _get_ode_matrix(
 
 
 # Terminate event functions
-def terminate_event(
+def sling_terminate_event(
     t: float,
     y: tuple[float, float, float, float, float, float],
     trebuchet: "Trebuchet",
