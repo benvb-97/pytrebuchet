@@ -147,3 +147,19 @@ def morrison(
         / (1 + np.power(reynolds_number / 263000, -8))
         + np.float_power(reynolds_number, 0.8) / 461000.0
     )
+
+
+def calculate_reynolds_number(
+    velocity: float,
+    diameter: float,
+    air_kinematic_viscosity: float,
+) -> float:
+    """Calculate the Reynolds number for a (spherical) projectile.
+
+    :param velocity: Velocity of the projectile (m/s)
+    :param diameter: Diameter of the projectile (m)
+    :param air_kinematic_viscosity: Kinematic viscosity of the air (m**2/s)
+
+    :return: Reynolds number (dimensionless)
+    """
+    return velocity * diameter / air_kinematic_viscosity
