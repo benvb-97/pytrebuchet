@@ -271,8 +271,8 @@ def _release_projectile_event(
         return 1.0
     if vy < 0:  # projectile is moving downwards, avoid false release
         return 1.0
-    if np.sqrt(vx**2 + vy**2) < 10.0:  # prevent release at low speeds  # noqa: PLR2004
-        return 1.0
+    # if np.sqrt(vx**2 + vy**2) < 10.0:  # prevent release at low speeds
+    #     return 1.0  # noqa: ERA001
 
     return velocity_angle - release_angle
 
