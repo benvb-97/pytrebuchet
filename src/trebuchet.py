@@ -480,6 +480,7 @@ class WhipperTrebuchet(Trebuchet):
             projectile=Projectile.default(),
             sling_projectile=Sling(length=4.0),
             sling_weight=Sling(length=4.0),
-            release_angle=60.0 * np.pi / 180.0,
+            arm_angle=60.0 * np.pi / 180.0,
+            release_angle=45.0 * np.pi / 180.0,
             weight_angle=10.0 * np.pi / 180.0,
         )
