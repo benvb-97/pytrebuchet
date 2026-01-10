@@ -132,7 +132,7 @@ class Simulation:
         self._solve_ballistic_phase()
 
         # Assert that projectile hits the ground
-        if self.get_phase_end_time(ballistic_phase=True) is None:
+        if self.get_phase_end_time(sim_phase=SimulationPhases.BALLISTIC) is None:
             msg = "Projectile did not hit the ground during the simulation."
             raise RuntimeError(msg)
 
@@ -142,9 +142,9 @@ class Simulation:
             warnings.warn(msg, stacklevel=1)
 
     def _solve_sling_phase(self, phase_index: int) -> None:
-        """Solve the differential equations for a specific trebuchet phase.
+        """Solve the differential equations for a specific sling phase.
 
-        :param phase_index: The index of the trebuchet phase to be solved
+        :param phase_index: The index of the sling phase to be solved
         """
         phase = self._sling_phases[phase_index]
 
@@ -173,18 +173,19 @@ class Simulation:
 
             y0 = self._sling_phase_solutions[prev_phase].y_events[0][0, :]
 
-            t_end_prev = self.get_phase_end_time(prev_phase)
+            t_end_prev = self.get_phase_end_time(
+                sim_phase=SimulationPhases.SLING, sling_phase=prev_phase
+            )
             t_span = (t_end_prev, t_end_prev + 5.0)
             t_eval = np.linspace(t_end_prev, t_end_prev + 5.0, 5 * 200)
 
         # Solve the ODE
         self._sling_phase_solutions[phase] = solve_ivp(
-            fun=sling_ode[phase],
+            fun=sling_ode,
             t_span=t_span,
             y0=y0,
             args=(
                 self.trebuchet,
-                self.projectile,
                 self.environment,
                 self._sling_phases[phase_index],
             ),
@@ -229,7 +230,9 @@ class Simulation:
         y0 = (px0, py0, vx0, vy0)
 
         # Define the time span for the integration, and the time evaluation points
-        release_time = self.get_phase_end_time(sling_phase=SlingPhases.UNCONSTRAINED)
+        release_time = self.get_phase_end_time(
+            sim_phase=SimulationPhases.SLING, sling_phase=SlingPhases.UNCONSTRAINED
+        )
         t_span = (release_time, release_time + 100.0)
         t_eval = np.linspace(release_time, release_time + 100.0, 100 * 200)
 
@@ -247,33 +250,30 @@ class Simulation:
 
     def get_phase_end_time(
         self,
-        *,
-        sling_phase: SlingPhases | None,
-        ballistic_phase: bool = False,
+        sim_phase: SimulationPhases,
+        sling_phase: SlingPhases | None = None,
     ) -> float:
         """Return the end time of the specified phase.
 
-        :param sling_phase: The sling phase to get the end time for.
-            If specified, ballistic_phase should be False.
-        :param ballistic_phase: Whether to get the end time of the ballistic phase.
-            If True, sling_phase should be None.
-
+        :param sim_phase: The simulation phase to get the end time for.
+        :param sling_phase: The sling phase to get the end time for,
+            required if sim_phase is SLING.
         :return: The end time of the specified phase.
         """
-        if sling_phase is not None:
-            if ballistic_phase:
-                msg = "Only one of sling_phase or ballistic_phase should be specified."
-                raise ValueError(msg)
-            if self._sling_phase_solutions[sling_phase] is None:
-                msg = f"Phase {sling_phase} has not been solved yet."
+        if sim_phase == SimulationPhases.SLING:
+            if sling_phase is None:
+                msg = (
+                    "sling_phase must be specified when sim_phase is ",
+                    f"{SimulationPhases.SLING}.",
+                )
                 raise ValueError(msg)
             return self._sling_phase_solutions[sling_phase].t_events[0][0]
 
-        if not ballistic_phase:
-            msg = "One of sling_phase or ballistic_phase must be specified."
-            raise ValueError(msg)
-        if self._ballistic_solution is None:
-            msg = "Ballistic phase has not been solved yet."
+        if sling_phase is not None:
+            msg = (
+                "sling_phase should be None when sim_phase is not ",
+                f"{SimulationPhases.SLING}.",
+            )
             raise ValueError(msg)
         return self._ballistic_solution.t_events[0][0]
 
@@ -316,62 +316,90 @@ class Simulation:
 
     @requires_solved
     def get_tsteps(
-        self, phase: SimulationPhases = SimulationPhases.ALL
+        self,
+        sim_phase: SimulationPhases = SimulationPhases.ALL,
+        sling_phase: SlingPhases | None = None,
     ) -> np.ndarray[float]:
         """Return the time steps for the specified phase(s) of the simulation.
 
-        :param phase: Phase of the simulation to get time steps for.
+        :param sim_phase: Phase of the simulation to get time steps for.
             Options are:
             ALL - all phases (default)
             BALLISTIC - ballistic phase
-            TREBUCHET - trebuchet phases
+            SLING - sling phases
+        :param sling_phase: Specific sling phase to get time steps for,
+            required if sim_phase is SLING.
 
         :return: Numpy array of time steps for the specified phase(s).
         """
         t_arrays = []
-        if phase in (SimulationPhases.ALL, SimulationPhases.SLING):
-            for _phase in self._sling_phases:
-                t_arrays.append(self._sling_phase_solutions[_phase].t)
-                t_arrays.append(self._sling_phase_solutions[_phase].t_events[0])
-        if phase in (SimulationPhases.ALL, SimulationPhases.BALLISTIC):
+        if sim_phase in (SimulationPhases.ALL, SimulationPhases.SLING):
+            all_sling_phases = bool(
+                sim_phase == SimulationPhases.ALL or sling_phase == SlingPhases.ALL
+            )
+            if all_sling_phases:
+                for _phase in self._sling_phases:
+                    t_arrays.append(self._sling_phase_solutions[_phase].t)
+                    t_arrays.append(self._sling_phase_solutions[_phase].t_events[0])
+            else:
+                t_arrays.append(self._sling_phase_solutions[sling_phase].t)
+                t_arrays.append(self._sling_phase_solutions[sling_phase].t_events[0])
+        if sim_phase in (SimulationPhases.ALL, SimulationPhases.BALLISTIC):
             t_arrays.append(self._ballistic_solution.t)
             t_arrays.append(self._ballistic_solution.t_events[0])
-        else:
-            msg = (
-                f"Invalid phase '{phase}'. Valid options are: "
-                f"{SimulationPhases.ALL}, {SimulationPhases.SLING}, ",
-                f"{SimulationPhases.BALLISTIC}.",
-            )
-            raise ValueError(msg)
 
         return np.concatenate(t_arrays)
 
     @requires_solved
-    def _get_phase_state_variables(self, phase: SimulationPhases) -> np.ndarray[float]:
-        """Return the state variables of the specified trebuchet phase.
+    def _get_phase_state_variables(
+        self, sim_phase: SimulationPhases, sling_phase: SlingPhases | None = None
+    ) -> np.ndarray[float]:
+        """Return the state variables of the specified sling phase.
 
         Combines the regular solution and the event solution.
 
-        :param phase: The trebuchet phase to get the state variables for.
+        :param sim_phase: The simulation phase to get the state variables for.
+        :param sling_phase: The sling phase to get the state variables for,
+            required if sim_phase is SLING.
 
         :return: Numpy array of shape (n, 6) where n is the number of time steps,
         containing the state variables
         """
-        y_arrays = []
-        if phase in (SimulationPhases.ALL, SimulationPhases.SLING):
-            for _phase in self._sling_phases:
-                y_arrays.append(self._sling_phase_solutions[_phase].y.T)
-                y_arrays.append(self._sling_phase_solutions[_phase].y_events[0])
-        if phase in (SimulationPhases.ALL, SimulationPhases.BALLISTIC):
-            y_arrays.append(self._ballistic_solution.y.T)
-            y_arrays.append(self._ballistic_solution.y_events[0])
-        else:
+        # Verify correct inputs
+        if sim_phase != SimulationPhases.SLING and sling_phase is not None:
             msg = (
-                f"Invalid phase '{phase}'. Valid options are: "
-                f"{SimulationPhases.ALL}, {SimulationPhases.SLING}, ",
-                f"{SimulationPhases.BALLISTIC}.",
+                "sling_phase should be None when sim_phase is not ",
+                f"{SimulationPhases.SLING}.",
             )
             raise ValueError(msg)
+        if sim_phase == SimulationPhases.SLING and sling_phase is None:
+            msg = (
+                "sling_phase must be specified when sim_phase is ",
+                f"{SimulationPhases.SLING}.",
+            )
+            raise ValueError(msg)
+
+        # Fetch state variables from the specified phase(s)
+        y_arrays = []
+
+        if sim_phase in (SimulationPhases.ALL, SimulationPhases.SLING):
+            # Determine if all sling phases are requested
+            all_sling_phases = bool(
+                sim_phase == SimulationPhases.ALL or sling_phase == SlingPhases.ALL
+            )
+            if all_sling_phases:
+                for _phase in self._sling_phases:
+                    y_arrays.append(self._sling_phase_solutions[_phase].y.T)
+                    y_arrays.append(self._sling_phase_solutions[_phase].y_events[0])
+            else:
+                # Only a specific sling phase is requested
+                y_arrays.append(self._sling_phase_solutions[sling_phase].y.T)
+                y_arrays.append(self._sling_phase_solutions[sling_phase].y_events[0])
+
+        if sim_phase in (SimulationPhases.ALL, SimulationPhases.BALLISTIC):
+            y_arrays.append(self._ballistic_solution.y.T)
+            y_arrays.append(self._ballistic_solution.y_events[0])
+
         return np.concatenate(y_arrays, axis=0)
 
     @requires_solved
@@ -398,22 +426,26 @@ class Simulation:
             angular_acceleration_projectile (if calculate_accelerations is True),
             ]
         """
-        # Fetch state variables from trebuchet phases
+        # Fetch state variables from sling phases
         variables = []
-        for phase in self._sling_phases:  # exclude ballistic phase
-            variables_phase = self._get_phase_state_variables(phase)
+        for sling_phase in self._sling_phases:
+            variables_phase = self._get_phase_state_variables(
+                sim_phase=SimulationPhases.SLING, sling_phase=sling_phase
+            )
 
             # Add angular accelerations if requested
             if calculate_accelerations:
-                t_steps = self.get_tsteps(phase=phase)
+                t_steps = self.get_tsteps(
+                    sim_phase=SimulationPhases.SLING, sling_phase=sling_phase
+                )
 
                 # Calculate angular accelerations at each time step
                 acc_variables = np.zeros((variables_phase.shape[0], 3))
-                args = (self.trebuchet, self.projectile, self.environment, phase)
+                args = (self.trebuchet, self.environment, sling_phase)
                 for i in range(t_steps.size):
-                    acc_variables[i, :] = sling_ode[phase](
-                        None, variables_phase[i, :], *args
-                    )[3:]
+                    acc_variables[i, :] = sling_ode(None, variables_phase[i, :], *args)[
+                        3:
+                    ]
 
                 # Concatenate accelerations to state variables
                 variables_phase = np.hstack((variables_phase, acc_variables))
@@ -438,7 +470,7 @@ class Simulation:
             Options are:
             ALL - all phases (default)
             BALLISTIC - ballistic phase
-            TREBUCHET - trebuchet phases
+            SLING - sling phases
 
         :param calculate_accelerations:
             Whether to include accelerations in the returned array (default is False)
@@ -469,7 +501,12 @@ class Simulation:
         # Initialize array to hold projectile state variables
         projectile_vars = np.empty(
             (
-                self.get_tsteps(phase=phase).shape[0],
+                self.get_tsteps(
+                    sim_phase=phase,
+                    sling_phase=SlingPhases.ALL
+                    if phase == SimulationPhases.SLING
+                    else None,
+                ).shape[0],
                 4 + (2 if calculate_accelerations else 0),
             ),
             dtype=float,
@@ -478,7 +515,7 @@ class Simulation:
 
         if phase in (
             SimulationPhases.ALL,
-            SimulationPhases.TREBUCHET,
+            SimulationPhases.SLING,
         ):  # Calculate positions and velocities from trebuchet state variables
             trebuchet_vars = self.get_trebuchet_state_variables(
                 calculate_accelerations=calculate_accelerations
@@ -528,7 +565,7 @@ class Simulation:
             SimulationPhases.ALL,
             SimulationPhases.BALLISTIC,
         ):  # Fetch positions and velocities from ballistic phase solution
-            t_ballistic = self.get_tsteps(phase=SimulationPhases.BALLISTIC)
+            t_ballistic = self.get_tsteps(sim_phase=SimulationPhases.BALLISTIC)
             end_idx = start_idx + t_ballistic.size
 
             projectile_vars[start_idx:end_idx, :4] = np.concatenate(
@@ -558,7 +595,7 @@ class Simulation:
     def where_sling_in_tension(
         self, *, return_projection_array: bool = False
     ) -> np.ndarray[bool]:
-        """Determine whether the sling is in tension throughout the trebuchet phases.
+        """Determine where the sling is in tension throughout the sling phases.
 
         :param return_projection_array:
             If True, returns the projection values instead of booleans
@@ -572,7 +609,7 @@ class Simulation:
         """
         # Get acceleration vector of the projectile
         projectile_vars = self.get_projectile_state_variables(
-            phase=SimulationPhases.TREBUCHET, calculate_accelerations=True
+            phase=SimulationPhases.SLING, calculate_accelerations=True
         )
         ax, ay = projectile_vars[:, 4], projectile_vars[:, 5]
 
