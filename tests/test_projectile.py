@@ -1,5 +1,7 @@
 """Unit tests for the Projectile class in pytrebuchet."""
 
+import pytest
+
 from drag_coefficient import clift_grace_weber
 from projectile import Projectile
 
@@ -32,3 +34,14 @@ def test_init_with_default_drag_coefficient() -> None:
     assert projectile.mass == 4.0
     assert projectile.diameter == 0.35
     assert projectile.drag_coefficient == clift_grace_weber
+
+
+def test_incorrect_init_raises_error() -> None:
+    """Test that incorrect input arguments raise Errors."""
+    with pytest.raises(
+        ValueError, match="Only one of mass or density should be provided\\."
+    ):
+        Projectile(mass=5.0, diameter=0.3, drag_coefficient=0.47, density=1000)
+
+    with pytest.raises(ValueError, match="Either mass or density must be provided\\."):
+        Projectile(mass=None, diameter=0.3, drag_coefficient=0.47, density=None)
