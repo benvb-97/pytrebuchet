@@ -1,4 +1,5 @@
-<!-- filepath: c:\Users\u0122906\Documents\pytrebuchet\README.md -->
+[![codecov](https://codecov.io/gh/benvb-97/pytrebuchet/graph/badge.svg?token=D4L0786S9N)](https://codecov.io/gh/benvb-97/pytrebuchet)
+
 # Pytrebuchet
 
 A Python-based trebuchet simulation project.
