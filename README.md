@@ -1,4 +1,7 @@
-<!-- filepath: c:\Users\u0122906\Documents\pytrebuchet\README.md -->
+[![Linter](https://github.com/benvb-97/pytrebuchet/actions/workflows/linter.yml/badge.svg)](https://github.com/benvb-97/pytrebuchet/actions/workflows/linter.yml)
+[![Run Tests](https://github.com/benvb-97/pytrebuchet/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/benvb-97/pytrebuchet/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/benvb-97/pytrebuchet/graph/badge.svg?token=D4L0786S9N)](https://codecov.io/gh/benvb-97/pytrebuchet)
+
 # Pytrebuchet
 
 A Python-based trebuchet simulation project.

@@ -1,23 +1,29 @@
-name: Run Tests
+name: Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - "main"
+      - "ci/**"
   pull_request:
     branches: [ "main" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.13', "3.14"]
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.13'  # or your preferred version
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
 
     - name: Install dependencies
       run: |
@@ -25,12 +31,12 @@ jobs:
         pip install -e .[dev]  # Assumes dev dependencies are listed in pyproject.toml
 
     - name: Run tests with coverage
-      run: pytest tests/ --cov=src/pytrebuchet --cov-report=term --cov-report=xml
+      run: pytest tests/ --cov=src/ --cov-report=term --cov-report=xml
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
-        file: ./coverage.xml
-        flags: unittests
+        files: ./coverage.xml
         name: codecov-umbrella
-        fail_ci_if_error: false
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
