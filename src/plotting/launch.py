@@ -32,9 +32,7 @@ def animate_launch(
     tsteps_trebuchet = simulation.get_tsteps(
         sim_phase=SimulationPhases.SLING, sling_phase=SlingPhases.ALL
     )[::skip]
-    tsteps_projectile = simulation.get_tsteps(sim_phase=SimulationPhases.BALLISTIC)[
-        ::skip
-    ]
+    tsteps_projectile = simulation.get_tsteps(sim_phase=SimulationPhases.ALL)[::skip]
 
     trebuchet_vars = simulation.get_trebuchet_state_variables()
     angles_arm = trebuchet_vars[:, 0][::skip]
