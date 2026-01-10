@@ -57,6 +57,10 @@ extend-ignore = [
                 "N803", "N806",  # Uppercase argument/variable in example files
 
                 ]
+"tests/*" = ["S101",  # Ignore use of assert in test files
+             "PLR2004",  # Ignore magic number violations in test files
+             "INP001",  # Ignore implicit namespace packages in test files
+            ]
 
 [tool.ruff.lint.pylint]
 max-args = 7  # Increase the maximum number of arguments allowed in a function
