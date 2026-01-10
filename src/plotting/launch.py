@@ -10,7 +10,7 @@ from simulation import Simulation, SimulationPhases
 
 def animate_launch(
     simulation: Simulation, skip: int = 5, delay: float = 25, *, show: bool = True
-) -> None:
+) -> None | animation.FuncAnimation:
     """Animate the trebuchet launch and projectile motion using matplotlib.
 
     :param simulation: Simulation instance with completed run
