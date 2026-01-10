@@ -2,5 +2,6 @@
 .venv/*
 .github/copilot-instructions.md
 *.py[cod]
-
+.coverage
+coverage.*
 __pycache__/
