@@ -1,7 +1,7 @@
 """Module for simulating trebuchet projectile launches."""
 
 import warnings
-from enum import IntEnum
+from enum import StrEnum
 from functools import wraps
 from typing import TYPE_CHECKING
 
@@ -39,12 +39,17 @@ def requires_solved(func: callable) -> callable:
     return wrapper
 
 
-class SimulationPhases(IntEnum):
+class SimulationPhases(StrEnum):
     """Enumeration of the different phases of the simulation."""
 
-    ALL = 0
-    SLING = 1
-    BALLISTIC = 2
+    # Both sling and ballistic phases
+    ALL = "ALL"
+
+    # Projectile in sling phase
+    SLING = "SLING"
+
+    # Projectile in ballistic phase
+    BALLISTIC = "BALLISTIC"
 
 
 class Simulation:
