@@ -271,8 +271,8 @@ def _release_projectile_event(
         return 1.0
     if vy < 0:  # projectile is moving downwards, avoid false release
         return 1.0
-    # if np.sqrt(vx**2 + vy**2) < 10.0:  # prevent release at low speeds
-    #     return 1.0  # noqa: ERA001
+    if np.sqrt(vx**2 + vy**2) < 10.0:  # prevent release at low speeds  # noqa: PLR2004
+        return 1.0
 
     return velocity_angle - release_angle
 
@@ -335,7 +335,7 @@ def _projectile_separates_from_arm_event(
         y,
         trebuchet,
         environment,
-        SlingPhases.PROJECTILE_CONTACT_ARM,
+        SlingPhases.UNCONSTRAINED,  # use unconstrained to get accelerations
     )
     ddtheta, _, ddpsi = np.linalg.solve(A, B)
 
@@ -373,7 +373,7 @@ def _weight_separates_from_arm_event(
         y,
         trebuchet,
         environment,
-        SlingPhases.PROJECTILE_AND_COUNTERWEIGHT_CONTACT_ARM,
+        SlingPhases.UNCONSTRAINED,  # use unconstrained to get accelerations
     )
     ddtheta, ddphi, _ = np.linalg.solve(A, B)
 
