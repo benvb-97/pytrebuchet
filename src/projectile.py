@@ -15,7 +15,7 @@ class Projectile:
         mass: float | None = 3.0,
         density: float | None = None,
         diameter: float = 0.2,
-        drag_coefficient: float | Callable = clift_grace_weber,
+        drag_coefficient: float | Callable | None = None,
     ) -> None:
         """Initialize a Projectile instance.
 
@@ -31,6 +31,8 @@ class Projectile:
             - callable: function that takes Reynolds number as input
                 and returns a drag coefficient. The function should be vectorized to
                 handle numpy arrays.
+            - None: use default drag coefficient function for smooth spheres calculated
+                using the Clift-Grace-Weber correlation.
         """
         if mass is None:
             if density is None:
@@ -46,6 +48,8 @@ class Projectile:
 
         if type(drag_coefficient) is float:  # constant drag coefficient
             self.drag_coefficient = lambda _: drag_coefficient
+        elif drag_coefficient is None:  # default drag coefficient function
+            self.drag_coefficient = clift_grace_weber
         else:
             self.drag_coefficient = drag_coefficient
 
