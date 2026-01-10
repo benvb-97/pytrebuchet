@@ -1,6 +1,6 @@
 """Ordinary differential equations (ODEs) for the unconstrained sling phase."""
 
-from enum import IntEnum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -11,22 +11,25 @@ if TYPE_CHECKING:
     from trebuchet import Trebuchet
 
 
-class SlingPhases(IntEnum):
+class SlingPhases(StrEnum):
     """Enumeration for the different sling phases."""
 
-    # Projectile is sliding on the ground
-    SLIDING_OVER_GROUND = 0
+    ALL = "ALL"
 
+    # Projectile is sliding on the ground
+    SLIDING_OVER_GROUND = "SLIDING_OVER_GROUND"
     # The projectile and counterweight are in contact with the arm
     # This phase occurs for whipper trebuchets.
-    PROJECTILE_AND_COUNTERWEIGHT_CONTACT_ARM = 1
+    PROJECTILE_AND_COUNTERWEIGHT_CONTACT_ARM = (
+        "PROJECTILE_AND_COUNTERWEIGHT_CONTACT_ARM"
+    )
 
     # The projectile is in contact with the arm, but the counterweight is not
     # This phase occurs for whipper trebuchets.
-    PROJECTILE_CONTACT_ARM = 2
+    PROJECTILE_CONTACT_ARM = "PROJECTILE_CONTACT_ARM"
 
     # Neither the projectile nor the counterweight are in contact with the arm
-    UNCONSTRAINED = 3
+    UNCONSTRAINED = "UNCONSTRAINED"
 
 
 def sling_ode(
@@ -61,7 +64,8 @@ def sling_ode(
     A, B = _get_ode_matrix(y, trebuchet, environment, sling_phase)  # noqa: N806
 
     # Solve for accelerations
-    ddtheta, ddphi, ddpsi = np.linalg.solve(A, B)
+    x = np.linalg.solve(A, B)
+    ddtheta, ddphi, ddpsi = x[0], x[1], x[2]
 
     return dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi
 
@@ -72,7 +76,7 @@ def _get_ode_matrix(
     environment: "EnvironmentConfig",
     sling_phase: SlingPhases,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Solves the ODEs for a projectile that is still in the sling.
+    """Construct the A and B matrices for the ODEs in the form Ax = B.
 
     :param y: tuple containing the state variables:
         (theta, phi, psi, dtheta, dphi, dpsi)
