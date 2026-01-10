@@ -60,7 +60,8 @@ extend-ignore = [
 "tests/*" = ["S101",  # Ignore use of assert in test files
              "PLR2004",  # Ignore magic number violations in test files
              "INP001",  # Ignore implicit namespace packages in test files
-            ]
+             "SLF001",  # Ignore private member access in test files
+             ]
 
 [tool.ruff.lint.pylint]
 max-args = 7  # Increase the maximum number of arguments allowed in a function
