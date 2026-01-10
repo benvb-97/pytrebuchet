@@ -53,7 +53,9 @@ extend-ignore = [
 [tool.ruff.lint.per-file-ignores]
 "examples/*" = ["I001",  # Ignore unsorted imports in example files
                 "T201",  # Ignore print statements in example files
-                "FBT003"  # Ignore positional boolean in example files
+                "FBT003",  # Ignore positional boolean in example files
+                "N803", "N806",  # Uppercase argument/variable in example files
+
                 ]
 
 [tool.ruff.lint.pylint]
