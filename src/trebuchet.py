@@ -410,60 +410,6 @@ class WhipperTrebuchet(Trebuchet):
         # Initialize weight angle.
         self.init_angle_weight = self.init_angle_arm - np.pi + self.init_angle_weight
 
-    def initial_weight_position_is_valid(self) -> bool:
-        """Check if the initial weight position is valid.
-
-        The weight CoG should be above the line formed by the projectile and its arm
-        end.
-
-        :return: True if valid, False otherwise
-        """
-        x_weight, y_weight = self.calculate_weight_point(
-            self.init_angle_arm, self.init_angle_weight
-        )
-        x_projectile, y_projectile = self.calculate_projectile_point(
-            self.init_angle_arm, self.init_angle_projectile
-        )
-        x_arm_projectile, y_arm_projectile = self.calculate_arm_endpoint_projectile(
-            self.init_angle_arm
-        )
-
-        # weight CoG should be above the line formed by the projectile and its arm end.
-        slope = (y_projectile - y_arm_projectile) / (x_projectile - x_arm_projectile)
-        y_line_at_weight_x = slope * (x_weight - x_arm_projectile) + y_arm_projectile
-        return y_weight >= y_line_at_weight_x
-
-    def calculate_initial_combined_cog(self) -> tuple[float, float]:
-        """Calculate the coordinates of the combined center of gravity (CoG).
-
-        The combined center of gravity (CoG) of the arm, weight, and projectile should
-        be to the right of the pivot point.
-
-        :return: CoG x- and y-coordinates
-        """
-        # Calculate arm CoG position
-        x_arm_cog, y_arm_cog = self.calculate_arm_cog(self.init_angle_arm)
-        x_projectile, y_projectile = self.calculate_projectile_point(
-            angle_arm=self.init_angle_arm, angle_projectile=self.init_angle_projectile
-        )
-        x_weight_cog, y_weight_cog = self.calculate_weight_point(
-            self.init_angle_arm, self.init_angle_weight
-        )
-
-        # Calculate combined CoG position
-        total_mass = self.arm.mass + self.weight.mass + self.projectile.mass
-        x_combined_cog = (
-            x_arm_cog * self.arm.mass
-            + x_weight_cog * self.weight.mass
-            + x_projectile * self.projectile.mass
-        ) / total_mass
-        y_combined_cog = (
-            y_arm_cog * self.arm.mass
-            + y_weight_cog * self.weight.mass
-            + y_projectile * self.projectile.mass
-        ) / total_mass
-        return x_combined_cog, y_combined_cog
-
     @classmethod
     def default(cls) -> "WhipperTrebuchet":
         """Create a whipper Trebuchet instance with default parameters."""
