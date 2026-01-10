@@ -1,0 +1,36 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'  # or your preferred version
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -e .[dev]  # Assumes dev dependencies are listed in pyproject.toml
+
+    - name: Run tests with coverage
+      run: pytest tests/ --cov=src/pytrebuchet --cov-report=term --cov-report=xml
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
