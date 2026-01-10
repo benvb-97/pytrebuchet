@@ -66,6 +66,10 @@ extend-ignore = [
 [tool.ruff.lint.pylint]
 max-args = 7  # Increase the maximum number of arguments allowed in a function
 
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=term-missing --cov-report=html --cov-report=xml"
+testpaths = ["tests"]
+
 [project.urls]
 Homepage = "https://github.com/benvb-97/pytrebuchet"
 Repository = "https://github.com/benvb-97/pytrebuchet"
