@@ -231,3 +231,88 @@ def test_whipper_simulation(
     # to ensure simulation ran without errors
     _ = simulation.distance_traveled
     _ = simulation.get_phase_end_time(sim_phase=SimulationPhases.BALLISTIC)
+
+
+def test_invalid_trebuchet_type(projectile: Projectile) -> None:
+    """Test that initialization with invalid trebuchet type raises TypeError."""
+
+    class InvalidTrebuchet:
+        """Mock invalid trebuchet class."""
+
+        def __init__(self) -> None:
+            self.projectile = projectile
+
+    with pytest.raises(TypeError, match="Invalid trebuchet configuration"):
+        Simulation(trebuchet=InvalidTrebuchet())
+
+
+def test_sling_goes_slack_warning(
+    hcw_trebuchet: HingedCounterweightTrebuchet, environment: EnvironmentConfig
+) -> None:
+    """Test that a warning is raised when sling goes slack."""
+    # Modify trebuchet to make sling go slack
+    total_arm_length = (
+        hcw_trebuchet.arm.length_weight_side + hcw_trebuchet.arm.length_projectile_side
+    )
+    arm_fraction = 0.65
+    hcw_trebuchet.arm.length_projectile_side = total_arm_length * arm_fraction
+    hcw_trebuchet.arm.length_weight_side = total_arm_length * (1 - arm_fraction)
+
+    simulation = Simulation(
+        trebuchet=hcw_trebuchet,
+        environment=environment,
+        verify_sling_tension=True,  # Enable automatic verification
+    )
+
+    with pytest.warns(UserWarning, match="Sling goes slack during the simulation"):
+        simulation.solve()
+
+
+def test_get_phase_end_time_errors(
+    hcw_trebuchet: HingedCounterweightTrebuchet, environment: EnvironmentConfig
+) -> None:
+    """Test error cases for get_phase_end_time method."""
+    simulation = Simulation(trebuchet=hcw_trebuchet, environment=environment)
+    simulation.solve()
+
+    # Test missing sling_phase when sim_phase is SLING
+    with pytest.raises(ValueError, match="sling_phase must be specified"):
+        simulation.get_phase_end_time(sim_phase=SimulationPhases.SLING)
+
+    # Test sling_phase provided when sim_phase is BALLISTIC
+    with pytest.raises(ValueError, match="sling_phase should be None"):
+        simulation.get_phase_end_time(
+            sim_phase=SimulationPhases.BALLISTIC,
+            sling_phase=SlingPhases.UNCONSTRAINED,
+        )
+
+
+def test_get_phase_state_variables_errors(
+    hcw_trebuchet: HingedCounterweightTrebuchet, environment: EnvironmentConfig
+) -> None:
+    """Test error cases for _get_phase_state_variables method."""
+    simulation = Simulation(trebuchet=hcw_trebuchet, environment=environment)
+    simulation.solve()
+
+    # Test sling_phase provided when sim_phase is BALLISTIC
+    with pytest.raises(ValueError, match="sling_phase should be None"):
+        simulation._get_phase_state_variables(
+            sim_phase=SimulationPhases.BALLISTIC,
+            sling_phase=SlingPhases.UNCONSTRAINED,
+        )
+
+    # Test missing sling_phase when sim_phase is SLING
+    with pytest.raises(ValueError, match="sling_phase must be specified"):
+        simulation._get_phase_state_variables(sim_phase=SimulationPhases.SLING)
+
+
+def test_get_projectile_state_variables_invalid_phase(
+    hcw_trebuchet: HingedCounterweightTrebuchet, environment: EnvironmentConfig
+) -> None:
+    """Test error case for invalid phase in get_projectile_state_variables."""
+    simulation = Simulation(trebuchet=hcw_trebuchet, environment=environment)
+    simulation.solve()
+
+    # Test invalid phase
+    with pytest.raises(ValueError, match="Invalid phase"):
+        simulation.get_projectile_state_variables(phase="INVALID")
