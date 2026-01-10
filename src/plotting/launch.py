@@ -129,5 +129,7 @@ def animate_launch(
 
     if show:
         plt.show()
+    else:
+        plt.close(fig)  # close the figure to prevent static display
 
     return ani
