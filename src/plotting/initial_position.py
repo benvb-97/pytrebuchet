@@ -1,18 +1,25 @@
 """Module for plotting the initial position of trebuchets."""
 
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from trebuchet import Trebuchet
 
 
-def plot_initial_position(trebuchet: Trebuchet) -> None:
+def plot_initial_position(
+    trebuchet: Trebuchet, *, show: bool = True
+) -> tuple[Figure, Axes]:
     """Plot the initial position of the trebuchet and the projectile.
 
     :param trebuchet: Trebuchet instance
+    :param show: If True, display the plot immediately.
+        Else, just return the figure and axes objects.
+
     :return: None
     """
     # Create figure
-    _, ax = plt.subplots()
+    fig, ax = plt.subplots()
     limits_x, limits_y = _get_trebuchet_limits(trebuchet)
     ax.set_xlim(limits_x[0], limits_x[1])
     ax.set_ylim(limits_y[0], limits_y[1])
@@ -58,7 +65,9 @@ def plot_initial_position(trebuchet: Trebuchet) -> None:
     ax.set_ylabel("Y")
     ax.set_title("Trebuchet Initial Position")
 
-    plt.show()
+    if show:
+        plt.show()
+    return fig, ax
 
 
 def _get_trebuchet_limits(
