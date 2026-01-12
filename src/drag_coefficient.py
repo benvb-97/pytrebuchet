@@ -21,7 +21,7 @@ def clift_grace_weber(
 
     """
     # Cast to numpy array for vectorized operations
-    if type(reynolds_number) is float:
+    if isinstance(reynolds_number, (float, np.floating)):
         is_float = True
         reynolds_number = np.array([reynolds_number])
     else:
@@ -124,12 +124,12 @@ def morrison(
     # Correlation is valid for Reynolds numbers between 0.1 and 1e6
     min_re = (
         reynolds_number
-        if isinstance(reynolds_number, float)
+        if isinstance(reynolds_number, (float, np.floating))
         else np.min(reynolds_number)
     )
     max_re = (
         reynolds_number
-        if isinstance(reynolds_number, float)
+        if isinstance(reynolds_number, (float, np.floating))
         else np.max(reynolds_number)
     )
 

@@ -55,7 +55,8 @@ class Projectile:
         self.mass = mass
         self.diameter = diameter
 
-        if isinstance(drag_coefficient, (float, int)):  # constant drag coefficient
+        if isinstance(drag_coefficient, (float, int, np.floating)):
+            # constant drag coefficient
             constant_cd: float = float(drag_coefficient)
             self.drag_coefficient = lambda _: constant_cd
         elif drag_coefficient is None:  # default drag coefficient function
