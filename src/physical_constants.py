@@ -1,4 +1,5 @@
 """Module defining physical constants for simulations."""
+
 from dataclasses import dataclass
 
 
