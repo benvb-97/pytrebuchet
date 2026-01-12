@@ -3,13 +3,14 @@
 import warnings
 
 import numpy as np
+from numpy.typing import NDArray
 
 from custom_warnings import OutsideValidRangeWarning
 
 
 def clift_grace_weber(
-    reynolds_number: float | np.ndarray[float],
-) -> float | np.ndarray[float]:
+    reynolds_number: float | NDArray[np.floating],
+) -> float | NDArray[np.floating]:
     """Calculate the drag coefficient for a smooth sphere based on the Reynolds number.
 
     ref: Clift, Grace, and Weber (Bubbles, Drops, and Particles, Academic Press, 1978)
@@ -25,6 +26,9 @@ def clift_grace_weber(
         reynolds_number = np.array([reynolds_number])
     else:
         is_float = False
+    if not isinstance(reynolds_number, np.ndarray):
+        msg = f"Expected float or np.ndarray, got {type(reynolds_number)}"
+        raise TypeError(msg)
 
     drag_coefficient = np.zeros_like(reynolds_number)
 
@@ -102,8 +106,8 @@ def clift_grace_weber(
 
 
 def morrison(
-    reynolds_number: float | np.ndarray[float],
-) -> float | np.ndarray[float]:
+    reynolds_number: float | NDArray[np.floating],
+) -> float | NDArray[np.floating]:
     """Calculate the drag coefficient for a smooth sphere based on the Reynolds number.
 
     Source: Data Correlation for Drag Coefficient for Sphere Faith A. Morrison,
