@@ -6,6 +6,7 @@ of trebuchet components.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import overload
 
 import numpy as np
 from numpy.typing import NDArray
@@ -20,8 +21,8 @@ class Arm:
     length_weight_side: float  # length of the arm on the weight side (m)
     length_projectile_side: float  # length of the arm on the projectile side (m)
     mass: float  # mass of the arm (kg)
-    inertia: float = None  # moment of inertia of the arm (kg*m^2)
-    d_pivot_to_cog: float = None  # distance from pivot to center of gravity (m)
+    inertia: float | None = None  # moment of inertia of the arm (kg*m^2)
+    d_pivot_to_cog: float | None = None  # distance from pivot to center of gravity (m)
 
     def __post_init__(self) -> None:
         """Calculate inertia and d_pivot_to_cog if not provided."""
@@ -79,7 +80,7 @@ class Trebuchet(ABC):
         sling_projectile: Sling,
         sling_weight: Sling,
         release_angle: float = 45 * np.pi / 180.0,
-        projectile: Projectile = None,
+        projectile: Projectile | None = None,
     ) -> None:
         """Initialize a Trebuchet instance with the given parameters.
 
@@ -114,11 +115,23 @@ class Trebuchet(ABC):
     def default(cls) -> "Trebuchet":
         """Create a Trebuchet instance with default parameters."""
 
+    @overload
+    def calculate_arm_cog(self, angle_arm: float) -> tuple[float, float]: ...
+
+    @overload
+    def calculate_arm_cog(
+        self, angle_arm: NDArray[np.floating]
+    ) -> tuple[NDArray[np.floating], NDArray[np.floating]]: ...
+
     # Position calculation functions
     def calculate_arm_cog(
         self, angle_arm: float | NDArray[np.floating]
-    ) -> float | NDArray[np.floating]:
+    ) -> tuple[float, float] | tuple[NDArray[np.floating], NDArray[np.floating]]:
         """Calculate the x and y coordinates of the arm center of gravity."""
+        if self.arm.d_pivot_to_cog is None:
+            msg = "Arm center of gravity distance from pivot is not defined."
+            raise ValueError(msg)
+
         x_arm_cog = -self.arm.d_pivot_to_cog * np.cos(angle_arm)
         y_arm_cog = self.pivot.height - self.arm.d_pivot_to_cog * np.sin(angle_arm)
         return x_arm_cog, y_arm_cog

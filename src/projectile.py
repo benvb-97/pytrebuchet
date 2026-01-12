@@ -3,11 +3,18 @@
 from collections.abc import Callable
 from math import pi
 
+import numpy as np
+from numpy.typing import NDArray
+
 from drag_coefficient import clift_grace_weber
 
 
 class Projectile:
     """Represent a spherical projectile launched by the trebuchet."""
+
+    drag_coefficient: Callable[
+        [float | NDArray[np.floating]], float | NDArray[np.floating]
+    ]
 
     def __init__(
         self,
@@ -15,7 +22,9 @@ class Projectile:
         mass: float | None = 3.0,
         density: float | None = None,
         diameter: float = 0.2,
-        drag_coefficient: float | Callable | None = None,
+        drag_coefficient: float
+        | Callable[[float | NDArray[np.floating]], float | NDArray[np.floating]]
+        | None = None,
     ) -> None:
         """Initialize a Projectile instance.
 
@@ -46,8 +55,10 @@ class Projectile:
         self.mass = mass
         self.diameter = diameter
 
-        if type(drag_coefficient) is float:  # constant drag coefficient
-            self.drag_coefficient = lambda _: drag_coefficient
+        if isinstance(drag_coefficient, (float, int, np.floating)):
+            # constant drag coefficient
+            constant_cd: float = float(drag_coefficient)
+            self.drag_coefficient = lambda _: constant_cd
         elif drag_coefficient is None:  # default drag coefficient function
             self.drag_coefficient = clift_grace_weber
         else:

@@ -1,11 +1,13 @@
 """Module for simulating trebuchet projectile launches."""
 
 import warnings
+from collections.abc import Callable
 from enum import StrEnum
 from functools import wraps
 from typing import TYPE_CHECKING
 
 import numpy as np
+from numpy.typing import NDArray
 from scipy.integrate import solve_ivp
 
 from differential_equations import (
@@ -19,10 +21,13 @@ from environment import EnvironmentConfig
 from trebuchet import HingedCounterweightTrebuchet, WhipperTrebuchet
 
 if TYPE_CHECKING:
+    from traitlets import Bunch
+
+    from projectile import Projectile
     from trebuchet import Trebuchet
 
 
-def requires_solved(func: callable) -> callable:
+def requires_solved(func: Callable) -> Callable:
     """Ensure that the simulation has been solved before accessing the decorated method.
 
     :raises ValueError: If the simulation has not been run yet (self.solved is False).
@@ -30,7 +35,7 @@ def requires_solved(func: callable) -> callable:
     """
 
     @wraps(func)
-    def wrapper(self: "Simulation", *args: object, **kwargs: object) -> callable:
+    def wrapper(self: "Simulation", *args: object, **kwargs: object) -> Callable:
         if not self.solved:
             msg = "Simulation has not been run yet."
             raise ValueError(msg)
@@ -50,6 +55,58 @@ class SimulationPhases(StrEnum):
 
     # Projectile in ballistic phase
     BALLISTIC = "BALLISTIC"
+
+
+class SlingODETerminationEvent:
+    """Event class to terminate the integration of the sling ode."""
+
+    terminal = True
+    direction = 0
+
+    def __call__(
+        self,
+        t: float,
+        y: tuple[float, float, float, float, float, float],
+        trebuchet: "Trebuchet",
+        environment: EnvironmentConfig,
+        sling_phase: SlingPhases,
+    ) -> float:
+        """Event function to terminate the integration of the sling ode.
+
+        The exact condition depends on the specific sling phase.
+
+        :param t: Current time
+        :param y: Current state variables
+        :param trebuchet: Trebuchet object containing trebuchet parameters
+        :param environment: EnvironmentConfig object containing environment parameters
+        :param sling_phase: Current sling phase
+        """
+        return sling_terminate_event(t, y, trebuchet, environment, sling_phase)
+
+
+class BallisticODETerminationEvent:
+    """Event class to terminate the integration of the ballistic ode."""
+
+    terminal = True
+    direction = 0
+
+    def __call__(
+        self,
+        t: float,
+        y: tuple[float, float, float, float],
+        environment: EnvironmentConfig,
+        projectile: "Projectile",
+    ) -> float:
+        """Event function to terminate the integration of the ballistic ode.
+
+        The integration stops when the projectile hits the ground.
+
+        :param t: Current time
+        :param y: Current state variables
+        :param environment: EnvironmentConfig object containing environment parameters
+        :param projectile: Projectile object containing properties of the projectile
+        """
+        return projectile_hits_ground_event(t, y, environment, projectile)
 
 
 class Simulation:
@@ -106,7 +163,7 @@ class Simulation:
 
         # sling phases to be simulated, in order
         if isinstance(self.trebuchet, HingedCounterweightTrebuchet):
-            self._sling_phases = (
+            self._sling_phases: tuple[SlingPhases, ...] = (
                 SlingPhases.SLIDING_OVER_GROUND,
                 SlingPhases.UNCONSTRAINED,
             )
@@ -121,8 +178,34 @@ class Simulation:
             raise TypeError(msg)
 
         # solve_ivp solutions for each sling phase
-        self._sling_phase_solutions = dict.fromkeys(self._sling_phases)
-        self._ballistic_solution = None
+        self._sling_phase_solutions: dict[SlingPhases, Bunch | None] = dict.fromkeys(
+            self._sling_phases
+        )
+        self._ballistic_solution: Bunch | None = None
+
+    def _get_sling_phase_solution(self, phase: SlingPhases) -> "Bunch":
+        """Get sling phase solution with validation.
+
+        :param phase: The sling phase to get the solution for
+        :return: The solve_ivp solution for the specified phase
+        :raises RuntimeError: If the solution is not available
+        """
+        solution = self._sling_phase_solutions[phase]
+        if solution is None:
+            msg = f"Sling phase solution for {phase} is not available."
+            raise RuntimeError(msg)
+        return solution
+
+    def _get_ballistic_solution(self) -> "Bunch":
+        """Get ballistic phase solution with validation.
+
+        :return: The solve_ivp solution for the ballistic phase
+        :raises RuntimeError: If the solution is not available
+        """
+        if self._ballistic_solution is None:
+            msg = "Ballistic phase solution is not available."
+            raise RuntimeError(msg)
+        return self._ballistic_solution
 
     def solve(self) -> None:
         """Run the simulation of the trebuchet launching the projectile."""
@@ -148,13 +231,6 @@ class Simulation:
         """
         phase = self._sling_phases[phase_index]
 
-        # Define the stopping event for the phase
-        def event(t: float, y: tuple[float, ...], *args: tuple) -> callable:
-            return sling_terminate_event(t, y, *args)
-
-        event.terminal = True
-        event.direction = 0
-
         # Define the initial conditions and time span for the integration
         if phase_index == 0:  # first phase
             y0 = (
@@ -170,8 +246,8 @@ class Simulation:
 
         else:  # retrieve from previous phase solution
             prev_phase = self._sling_phases[phase_index - 1]
-
-            y0 = self._sling_phase_solutions[prev_phase].y_events[0][0, :]
+            ode_solution = self._get_sling_phase_solution(prev_phase)
+            y0 = ode_solution.y_events[0][0, :]
 
             t_end_prev = self.get_phase_end_time(
                 sim_phase=SimulationPhases.SLING, sling_phase=prev_phase
@@ -190,7 +266,7 @@ class Simulation:
                 self._sling_phases[phase_index],
             ),
             t_eval=t_eval,
-            events=event,
+            events=SlingODETerminationEvent(),
             atol=self._atol,
             rtol=self._rtol,
         )
@@ -205,17 +281,10 @@ class Simulation:
         # Define the constants for the differential equations
         args = (self.environment, self.projectile)
 
-        # Define the event to stop the integration when the projectile hits the ground
-        def event(t: float, y: tuple[float, ...], *args: tuple) -> callable:
-            return projectile_hits_ground_event(t, y, *args)
-
-        event.terminal = True
-        event.direction = 0
-
         # Define the initial conditions from the end of the sling phase
-        theta0, _, psi0, dtheta0, _, dpsi0 = self._sling_phase_solutions[
-            SlingPhases.UNCONSTRAINED
-        ].y_events[0][0, :]
+        ode_solution = self._get_sling_phase_solution(SlingPhases.UNCONSTRAINED)
+
+        theta0, _, psi0, dtheta0, _, dpsi0 = ode_solution.y_events[0][0, :]
         px0, py0 = self.trebuchet.calculate_projectile_point(
             angle_arm=theta0, angle_projectile=psi0
         )
@@ -243,7 +312,7 @@ class Simulation:
             y0=y0,
             args=args,
             t_eval=t_eval,
-            events=event,
+            events=BallisticODETerminationEvent(),
             atol=self._atol,
             rtol=self._rtol,
         )
@@ -267,7 +336,8 @@ class Simulation:
                     f"{SimulationPhases.SLING}.",
                 )
                 raise ValueError(msg)
-            return self._sling_phase_solutions[sling_phase].t_events[0][0]
+            ode_solution = self._get_sling_phase_solution(sling_phase)
+            return ode_solution.t_events[0][0]
 
         if sling_phase is not None:
             msg = (
@@ -275,7 +345,7 @@ class Simulation:
                 f"{SimulationPhases.SLING}.",
             )
             raise ValueError(msg)
-        return self._ballistic_solution.t_events[0][0]
+        return self._get_ballistic_solution().t_events[0][0]
 
     @property
     def solved(self) -> bool:
@@ -299,7 +369,7 @@ class Simulation:
 
         :return: Horizontal distance traveled by the projectile.
         """
-        return self._ballistic_solution.y_events[0][0, 0]
+        return self._get_ballistic_solution().y_events[0][0, 0]
 
     @property
     @requires_solved
@@ -319,7 +389,7 @@ class Simulation:
         self,
         sim_phase: SimulationPhases = SimulationPhases.ALL,
         sling_phase: SlingPhases | None = None,
-    ) -> np.ndarray[float]:
+    ) -> NDArray[np.floating]:
         """Return the time steps for the specified phase(s) of the simulation.
 
         :param sim_phase: Phase of the simulation to get time steps for.
@@ -339,21 +409,30 @@ class Simulation:
             )
             if all_sling_phases:
                 for _phase in self._sling_phases:
-                    t_arrays.append(self._sling_phase_solutions[_phase].t)
-                    t_arrays.append(self._sling_phase_solutions[_phase].t_events[0])
+                    ode_solution = self._get_sling_phase_solution(_phase)
+                    t_arrays.append(ode_solution.t)
+                    t_arrays.append(ode_solution.t_events[0])
             else:
-                t_arrays.append(self._sling_phase_solutions[sling_phase].t)
-                t_arrays.append(self._sling_phase_solutions[sling_phase].t_events[0])
+                if sling_phase is None:
+                    msg = (
+                        "Sling_phase must be specified when sim_phase is ",
+                        f"{SimulationPhases.SLING}.",
+                    )
+                    raise ValueError(msg)
+                ode_solution = self._get_sling_phase_solution(sling_phase)
+                t_arrays.append(ode_solution.t)
+                t_arrays.append(ode_solution.t_events[0])
         if sim_phase in (SimulationPhases.ALL, SimulationPhases.BALLISTIC):
-            t_arrays.append(self._ballistic_solution.t)
-            t_arrays.append(self._ballistic_solution.t_events[0])
+            ballistic_solution = self._get_ballistic_solution()
+            t_arrays.append(ballistic_solution.t)
+            t_arrays.append(ballistic_solution.t_events[0])
 
         return np.concatenate(t_arrays)
 
     @requires_solved
     def _get_phase_state_variables(
         self, sim_phase: SimulationPhases, sling_phase: SlingPhases | None = None
-    ) -> np.ndarray[float]:
+    ) -> NDArray[np.floating]:
         """Return the state variables of the specified sling phase.
 
         Combines the regular solution and the event solution.
@@ -389,23 +468,31 @@ class Simulation:
             )
             if all_sling_phases:
                 for _phase in self._sling_phases:
-                    y_arrays.append(self._sling_phase_solutions[_phase].y.T)
-                    y_arrays.append(self._sling_phase_solutions[_phase].y_events[0])
+                    ode_solution = self._get_sling_phase_solution(_phase)
+                    y_arrays.append(ode_solution.y.T)
+                    y_arrays.append(ode_solution.y_events[0])
             else:
+                if sling_phase is None:
+                    msg = (
+                        "Sling_phase must be specified when sim_phase is ",
+                        f"{SimulationPhases.SLING}.",
+                    )
+                    raise ValueError(msg)
                 # Only a specific sling phase is requested
-                y_arrays.append(self._sling_phase_solutions[sling_phase].y.T)
-                y_arrays.append(self._sling_phase_solutions[sling_phase].y_events[0])
-
+                ode_solution = self._get_sling_phase_solution(sling_phase)
+                y_arrays.append(ode_solution.y.T)
+                y_arrays.append(ode_solution.y_events[0])
         if sim_phase in (SimulationPhases.ALL, SimulationPhases.BALLISTIC):
-            y_arrays.append(self._ballistic_solution.y.T)
-            y_arrays.append(self._ballistic_solution.y_events[0])
+            ballistic_solution = self._get_ballistic_solution()
+            y_arrays.append(ballistic_solution.y.T)
+            y_arrays.append(ballistic_solution.y_events[0])
 
         return np.concatenate(y_arrays, axis=0)
 
     @requires_solved
     def get_trebuchet_state_variables(
         self, *, calculate_accelerations: bool = False
-    ) -> np.ndarray[float]:
+    ) -> NDArray[np.floating]:
         """Return the state variables (angles and angular velocities) of the trebuchet.
 
         :param calculate_accelerations:
@@ -443,7 +530,8 @@ class Simulation:
                 acc_variables = np.zeros((variables_phase.shape[0], 3))
                 args = (self.trebuchet, self.environment, sling_phase)
                 for i in range(t_steps.size):
-                    acc_variables[i, :] = sling_ode(None, variables_phase[i, :], *args)[
+                    # Pass 0.0 as time since sling_ode is time-invariant
+                    acc_variables[i, :] = sling_ode(0.0, variables_phase[i, :], *args)[
                         3:
                     ]
 
@@ -461,7 +549,7 @@ class Simulation:
         phase: SimulationPhases = SimulationPhases.ALL,
         *,
         calculate_accelerations: bool = False,
-    ) -> np.ndarray[float]:
+    ) -> NDArray[np.floating]:
         """Return the state variables of the projectile throughout its flight.
 
         This includes the (positions, velocities, optional accelerations)
@@ -568,10 +656,12 @@ class Simulation:
             t_ballistic = self.get_tsteps(sim_phase=SimulationPhases.BALLISTIC)
             end_idx = start_idx + t_ballistic.size
 
+            ballistic_solution = self._get_ballistic_solution()
+
             projectile_vars[start_idx:end_idx, :4] = np.concatenate(
                 (
-                    self._ballistic_solution.y.T,
-                    self._ballistic_solution.y_events[0],
+                    ballistic_solution.y.T,
+                    ballistic_solution.y_events[0],
                 ),
                 axis=0,
             )
@@ -582,9 +672,10 @@ class Simulation:
                 acc_ballistic = np.zeros((t_ballistic.size, 3))
                 args = (self.environment, self.projectile)
                 for i in range(t_ballistic.size):
-                    acc_ballistic[i, :] = ballistic_ode(
-                        None, projectile_vars[i, :4], *args
-                    )[2:]
+                    # Pass 0.0 as time since ballistic_ode is time-invariant
+                    y = tuple(projectile_vars[i, :4])
+
+                    acc_ballistic[i, :] = ballistic_ode(0.0, y, *args)[2:]
 
                 # Concatenate accelerations to state variables
                 projectile_vars[start_idx:end_idx, 4:] = acc_ballistic
@@ -594,7 +685,7 @@ class Simulation:
     @requires_solved
     def where_sling_in_tension(
         self, *, return_projection_array: bool = False
-    ) -> np.ndarray[bool]:
+    ) -> NDArray[np.floating] | NDArray[np.bool_]:
         """Determine where the sling is in tension throughout the sling phases.
 
         :param return_projection_array:

@@ -3,13 +3,14 @@
 import warnings
 
 import numpy as np
+from numpy.typing import NDArray
 
 from custom_warnings import OutsideValidRangeWarning
 
 
 def clift_grace_weber(
-    reynolds_number: float | np.ndarray[float],
-) -> float | np.ndarray[float]:
+    reynolds_number: float | NDArray[np.floating],
+) -> float | NDArray[np.floating]:
     """Calculate the drag coefficient for a smooth sphere based on the Reynolds number.
 
     ref: Clift, Grace, and Weber (Bubbles, Drops, and Particles, Academic Press, 1978)
@@ -20,11 +21,14 @@ def clift_grace_weber(
 
     """
     # Cast to numpy array for vectorized operations
-    if type(reynolds_number) is float:
+    if isinstance(reynolds_number, (float, np.floating)):
         is_float = True
         reynolds_number = np.array([reynolds_number])
     else:
         is_float = False
+    if not isinstance(reynolds_number, np.ndarray):
+        msg = f"Expected float or np.ndarray, got {type(reynolds_number)}"
+        raise TypeError(msg)
 
     drag_coefficient = np.zeros_like(reynolds_number)
 
@@ -102,8 +106,8 @@ def clift_grace_weber(
 
 
 def morrison(
-    reynolds_number: float | np.ndarray[float],
-) -> float | np.ndarray[float]:
+    reynolds_number: float | NDArray[np.floating],
+) -> float | NDArray[np.floating]:
     """Calculate the drag coefficient for a smooth sphere based on the Reynolds number.
 
     Source: Data Correlation for Drag Coefficient for Sphere Faith A. Morrison,
@@ -120,12 +124,12 @@ def morrison(
     # Correlation is valid for Reynolds numbers between 0.1 and 1e6
     min_re = (
         reynolds_number
-        if isinstance(reynolds_number, float)
+        if isinstance(reynolds_number, (float, np.floating))
         else np.min(reynolds_number)
     )
     max_re = (
         reynolds_number
-        if isinstance(reynolds_number, float)
+        if isinstance(reynolds_number, (float, np.floating))
         else np.max(reynolds_number)
     )
 
