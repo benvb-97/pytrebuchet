@@ -1,5 +1,6 @@
 [![Linter](https://github.com/benvb-97/pytrebuchet/actions/workflows/linter.yml/badge.svg)](https://github.com/benvb-97/pytrebuchet/actions/workflows/linter.yml)
 [![Run Tests](https://github.com/benvb-97/pytrebuchet/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/benvb-97/pytrebuchet/actions/workflows/tests.yml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/9044d19fa45840ea982c662294695d9a)](https://app.codacy.com/gh/benvb-97/pytrebuchet/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![codecov](https://codecov.io/gh/benvb-97/pytrebuchet/graph/badge.svg?token=D4L0786S9N)](https://codecov.io/gh/benvb-97/pytrebuchet)
 
 # Pytrebuchet
