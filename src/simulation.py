@@ -63,8 +63,8 @@ class SlingODETerminationEvent:
     terminal = True
     direction = 0
 
-    @staticmethod
     def __call__(
+        self,
         t: float,
         y: tuple[float, float, float, float, float, float],
         trebuchet: "Trebuchet",
@@ -90,8 +90,8 @@ class BallisticODETerminationEvent:
     terminal = True
     direction = 0
 
-    @staticmethod
     def __call__(
+        self,
         t: float,
         y: tuple[float, float, float, float],
         environment: EnvironmentConfig,
@@ -266,7 +266,7 @@ class Simulation:
                 self._sling_phases[phase_index],
             ),
             t_eval=t_eval,
-            events=SlingODETerminationEvent,
+            events=SlingODETerminationEvent(),
             atol=self._atol,
             rtol=self._rtol,
         )
@@ -312,7 +312,7 @@ class Simulation:
             y0=y0,
             args=args,
             t_eval=t_eval,
-            events=BallisticODETerminationEvent,
+            events=BallisticODETerminationEvent(),
             atol=self._atol,
             rtol=self._rtol,
         )
