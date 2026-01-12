@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e96c7292e7864df2a56c2c55a9520118)](https://app.codacy.com/gh/benvb-97/pytrebuchet?utm_source=github.com&utm_medium=referral&utm_content=benvb-97/pytrebuchet&utm_campaign=Badge_Grade)
 [![Linter](https://github.com/benvb-97/pytrebuchet/actions/workflows/linter.yml/badge.svg)](https://github.com/benvb-97/pytrebuchet/actions/workflows/linter.yml)
 [![Run Tests](https://github.com/benvb-97/pytrebuchet/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/benvb-97/pytrebuchet/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/benvb-97/pytrebuchet/graph/badge.svg?token=D4L0786S9N)](https://codecov.io/gh/benvb-97/pytrebuchet)
