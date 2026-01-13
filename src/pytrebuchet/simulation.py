@@ -10,21 +10,21 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.integrate import solve_ivp
 
-from differential_equations import (
+from pytrebuchet.differential_equations import (
     SlingPhases,
     ballistic_ode,
     projectile_hits_ground_event,
     sling_ode,
     sling_terminate_event,
 )
-from environment import EnvironmentConfig
-from trebuchet import HingedCounterweightTrebuchet, WhipperTrebuchet
+from pytrebuchet.environment import EnvironmentConfig
+from pytrebuchet.trebuchet import HingedCounterweightTrebuchet, WhipperTrebuchet
 
 if TYPE_CHECKING:
     from traitlets import Bunch
 
-    from projectile import Projectile
-    from trebuchet import Trebuchet
+    from pytrebuchet.projectile import Projectile
+    from pytrebuchet.trebuchet import Trebuchet
 
 
 def requires_solved(func: Callable) -> Callable:

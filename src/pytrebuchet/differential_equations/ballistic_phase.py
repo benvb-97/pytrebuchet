@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from drag_coefficient import calculate_reynolds_number
+from pytrebuchet.drag_coefficient import calculate_reynolds_number
 
 if TYPE_CHECKING:
     from environment import EnvironmentConfig

@@ -3,14 +3,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
+from matplotlib.lines import Line2D
+from matplotlib.patches import Circle
 
-from differential_equations.sling_phase import SlingPhases
-from simulation import Simulation, SimulationPhases
+from pytrebuchet.differential_equations.sling_phase import SlingPhases
+from pytrebuchet.simulation import Simulation, SimulationPhases
 
 
 def animate_launch(
     simulation: Simulation, skip: int = 5, delay: float = 25, *, show: bool = True
-) -> None | animation.FuncAnimation:
+) -> animation.FuncAnimation:
     """Animate the trebuchet launch and projectile motion using matplotlib.
 
     :param simulation: Simulation instance with completed run
@@ -64,8 +66,8 @@ def animate_launch(
     (line_projectile,) = ax.plot([], [], c="orange")
 
     # Create circles for weight and projectile
-    circle_weight = plt.Circle((0.0, 0.0), projectile.diameter, color="blue", fill=True)
-    circle_projectile = plt.Circle(
+    circle_weight = Circle((0.0, 0.0), projectile.diameter, color="blue", fill=True)
+    circle_projectile = Circle(
         (0.0, 0.0), projectile.diameter / 2, color="orange", fill=True
     )
     ax.add_patch(circle_projectile)
@@ -81,7 +83,7 @@ def animate_launch(
         label="Projectile Trajectory",
     )
 
-    def update(frame: int) -> animation.FuncAnimation:
+    def update(frame: int) -> tuple[Line2D, Line2D, Line2D, Line2D, Circle, Circle]:
         if frame < tsteps_trebuchet.size:  # Animate both trebuchet and projectile
             line_arm_projectile.set_data(
                 [0.0, x_arm_projectile[frame]],
