@@ -209,14 +209,6 @@ class Trebuchet(ABC):
 
         :return: x, y coordinates of the weight point
         """
-        # Check that angle_arm and angle_weight have the same type
-        if type(angle_arm) is not type(angle_weight):
-            msg = (
-                "angle_arm and angle_weight must have the same type.",
-                f" Got {type(angle_arm)} and {type(angle_weight)}.",
-            )
-            raise TypeError(msg)
-
         x_arm_weight, y_arm_weight = self.calculate_arm_endpoint_weight(angle_arm)
 
         x_weight = x_arm_weight + np.cos(angle_weight) * self.sling_weight.length
@@ -247,13 +239,6 @@ class Trebuchet(ABC):
 
         :return: x, y coordinates of the projectile point
         """
-        if type(angle_arm) is not type(angle_projectile):
-            msg = (
-                "angle_arm and angle_projectile must have the same type.",
-                f" Got {type(angle_arm)} and {type(angle_projectile)}.",
-            )
-            raise TypeError(msg)
-
         x_arm_projectile, y_arm_projectile = self.calculate_arm_endpoint_projectile(
             angle_arm
         )
@@ -300,20 +285,6 @@ class Trebuchet(ABC):
           the projectile sling (radians/s)
         :return: x, y components of the projectile velocity
         """
-        # Check that all inputs have the same type
-        types = {
-            type(angle_arm),
-            type(angle_projectile),
-            type(angular_velocity_arm),
-            type(angular_velocity_projectile),
-        }
-        if len(types) != 1:
-            msg = (
-                "All input parameters must have the same type.",
-                f" Got types: {types}.",
-            )
-            raise TypeError(msg)
-
         vx = self.arm.length_projectile_side * angular_velocity_arm * np.sin(
             angle_arm
         ) - self.sling_projectile.length * angular_velocity_projectile * np.sin(
@@ -371,22 +342,6 @@ class Trebuchet(ABC):
 
         :return: x, y components of the projectile acceleration
         """
-        # Check that all inputs have the same type
-        types = {
-            type(angle_arm),
-            type(angle_projectile),
-            type(angular_velocity_arm),
-            type(angular_velocity_projectile),
-            type(angular_acceleration_arm),
-            type(angular_acceleration_projectile),
-        }
-        if len(types) != 1:
-            msg = (
-                "All input parameters must have the same type.",
-                f" Got types: {types}.",
-            )
-            raise TypeError(msg)
-
         theta, psi, dtheta, dpsi, ddtheta, ddpsi = (
             angle_arm,
             angle_projectile,
