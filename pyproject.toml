@@ -38,6 +38,7 @@ dev = [
     "pytest-cov>=7.0.0",
     "ruff>=0.14.4",
     "mypy>=1.19.1",
+    "sphinx>=9.1.0",
 ]
 
 [tool.setuptools]
