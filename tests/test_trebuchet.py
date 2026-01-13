@@ -3,9 +3,9 @@
 import numpy as np
 import pytest
 
-from drag_coefficient import clift_grace_weber
-from projectile import Projectile
-from trebuchet import (
+from pytrebuchet.drag_coefficient import clift_grace_weber
+from pytrebuchet.projectile import Projectile
+from pytrebuchet.trebuchet import (
     Arm,
     HingedCounterweightTrebuchet,
     Pivot,

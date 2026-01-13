@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 import pytest
 
-from drag_coefficient import (
+from pytrebuchet.drag_coefficient import (
     calculate_reynolds_number,
     clift_grace_weber,
     morrison,
