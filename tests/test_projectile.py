@@ -1,9 +1,11 @@
 """Unit tests for the Projectile class in pytrebuchet."""
 
+import numpy as np
 import pytest
+from numpy.typing import NDArray
 
-from drag_coefficient import clift_grace_weber
-from projectile import Projectile
+from pytrebuchet.drag_coefficient import clift_grace_weber
+from pytrebuchet.projectile import Projectile
 
 
 def test_init_with_constant_drag_coefficient() -> None:
@@ -18,7 +20,9 @@ def test_init_with_constant_drag_coefficient() -> None:
 def test_init_with_callable_drag_coefficient() -> None:
     """Test that a callable drag coefficient function is accepted."""
 
-    def custom_drag(reynolds: float) -> float:
+    def custom_drag(
+        reynolds: float | NDArray[np.floating],
+    ) -> float | NDArray[np.floating]:
         return 0.5 if reynolds < 1000 else 0.3
 
     projectile = Projectile(mass=3.0, diameter=0.25, drag_coefficient=custom_drag)

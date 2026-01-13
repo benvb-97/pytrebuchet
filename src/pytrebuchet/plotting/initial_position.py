@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from trebuchet import Trebuchet
+from pytrebuchet.trebuchet import Trebuchet
 
 
 def plot_initial_position(

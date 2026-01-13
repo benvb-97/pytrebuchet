@@ -1,6 +1,6 @@
 """Test cases for the environment module."""
 
-from environment import EnvironmentConfig
+from pytrebuchet.environment import EnvironmentConfig
 
 
 def test_environment_initialization() -> None:

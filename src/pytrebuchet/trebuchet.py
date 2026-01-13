@@ -11,7 +11,7 @@ from typing import overload
 import numpy as np
 from numpy.typing import NDArray
 
-from projectile import Projectile
+from pytrebuchet.projectile import Projectile
 
 
 @dataclass
@@ -115,6 +115,7 @@ class Trebuchet(ABC):
     def default(cls) -> "Trebuchet":
         """Create a Trebuchet instance with default parameters."""
 
+    # Position calculation functions
     @overload
     def calculate_arm_cog(self, angle_arm: float) -> tuple[float, float]: ...
 
@@ -123,7 +124,6 @@ class Trebuchet(ABC):
         self, angle_arm: NDArray[np.floating]
     ) -> tuple[NDArray[np.floating], NDArray[np.floating]]: ...
 
-    # Position calculation functions
     def calculate_arm_cog(
         self, angle_arm: float | NDArray[np.floating]
     ) -> tuple[float, float] | tuple[NDArray[np.floating], NDArray[np.floating]]:
@@ -135,6 +135,16 @@ class Trebuchet(ABC):
         x_arm_cog = -self.arm.d_pivot_to_cog * np.cos(angle_arm)
         y_arm_cog = self.pivot.height - self.arm.d_pivot_to_cog * np.sin(angle_arm)
         return x_arm_cog, y_arm_cog
+
+    @overload
+    def calculate_arm_endpoint_projectile(
+        self, angle_arm: float
+    ) -> tuple[float, float]: ...
+
+    @overload
+    def calculate_arm_endpoint_projectile(
+        self, angle_arm: NDArray[np.floating]
+    ) -> tuple[NDArray[np.floating], NDArray[np.floating]]: ...
 
     def calculate_arm_endpoint_projectile(
         self, angle_arm: float | NDArray[np.floating]
@@ -151,6 +161,16 @@ class Trebuchet(ABC):
 
         return x_arm_projectile, y_arm_projectile
 
+    @overload
+    def calculate_arm_endpoint_weight(
+        self, angle_arm: float
+    ) -> tuple[float, float]: ...
+
+    @overload
+    def calculate_arm_endpoint_weight(
+        self, angle_arm: NDArray[np.floating]
+    ) -> tuple[NDArray[np.floating], NDArray[np.floating]]: ...
+
     def calculate_arm_endpoint_weight(
         self, angle_arm: float | NDArray[np.floating]
     ) -> tuple[float | NDArray[np.floating], float | NDArray[np.floating]]:
@@ -165,6 +185,17 @@ class Trebuchet(ABC):
         )
 
         return x_arm_weight, y_arm_weight
+
+    @overload
+    def calculate_weight_point(
+        self, angle_arm: float, angle_weight: float
+    ) -> tuple[float, float]: ...
+    @overload
+    def calculate_weight_point(
+        self,
+        angle_arm: NDArray[np.floating],
+        angle_weight: NDArray[np.floating],
+    ) -> tuple[NDArray[np.floating], NDArray[np.floating]]: ...
 
     def calculate_weight_point(
         self,
@@ -184,6 +215,17 @@ class Trebuchet(ABC):
         y_weight = y_arm_weight + np.sin(angle_weight) * self.sling_weight.length
 
         return x_weight, y_weight
+
+    @overload
+    def calculate_projectile_point(
+        self, angle_arm: float, angle_projectile: float
+    ) -> tuple[float, float]: ...
+    @overload
+    def calculate_projectile_point(
+        self,
+        angle_arm: NDArray[np.floating],
+        angle_projectile: NDArray[np.floating],
+    ) -> tuple[NDArray[np.floating], NDArray[np.floating]]: ...
 
     def calculate_projectile_point(
         self,
@@ -209,6 +251,23 @@ class Trebuchet(ABC):
         )
 
         return x_projectile, y_projectile
+
+    @overload
+    def calculate_projectile_velocity(
+        self,
+        angle_arm: float,
+        angle_projectile: float,
+        angular_velocity_arm: float,
+        angular_velocity_projectile: float,
+    ) -> tuple[float, float]: ...
+    @overload
+    def calculate_projectile_velocity(
+        self,
+        angle_arm: NDArray[np.floating],
+        angle_projectile: NDArray[np.floating],
+        angular_velocity_arm: NDArray[np.floating],
+        angular_velocity_projectile: NDArray[np.floating],
+    ) -> tuple[NDArray[np.floating], NDArray[np.floating]]: ...
 
     def calculate_projectile_velocity(
         self,
@@ -239,6 +298,27 @@ class Trebuchet(ABC):
         )
 
         return vx, vy
+
+    @overload
+    def calculate_projectile_acceleration(
+        self,
+        angle_arm: float,
+        angle_projectile: float,
+        angular_velocity_arm: float,
+        angular_velocity_projectile: float,
+        angular_acceleration_arm: float,
+        angular_acceleration_projectile: float,
+    ) -> tuple[float, float]: ...
+    @overload
+    def calculate_projectile_acceleration(
+        self,
+        angle_arm: NDArray[np.floating],
+        angle_projectile: NDArray[np.floating],
+        angular_velocity_arm: NDArray[np.floating],
+        angular_velocity_projectile: NDArray[np.floating],
+        angular_acceleration_arm: NDArray[np.floating],
+        angular_acceleration_projectile: NDArray[np.floating],
+    ) -> tuple[NDArray[np.floating], NDArray[np.floating]]: ...
 
     def calculate_projectile_acceleration(
         self,

@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 from numpy.typing import NDArray
 
-from custom_warnings import OutsideValidRangeWarning
+from pytrebuchet.custom_warnings import OutsideValidRangeWarning
 
 
 def clift_grace_weber(

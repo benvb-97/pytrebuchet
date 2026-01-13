@@ -3,9 +3,9 @@
 import pytest
 from matplotlib.animation import FuncAnimation
 
-from plotting.launch import animate_launch
-from simulation import Simulation
-from trebuchet import HingedCounterweightTrebuchet
+from pytrebuchet.plotting.launch import animate_launch
+from pytrebuchet.simulation import Simulation
+from pytrebuchet.trebuchet import HingedCounterweightTrebuchet
 
 
 @pytest.fixture(scope="module")

@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from physical_constants import PhysicalConstants as PhCo
+from pytrebuchet.physical_constants import PhysicalConstants as PhCo
 
 
 @dataclass

@@ -6,7 +6,7 @@ from math import pi
 import numpy as np
 from numpy.typing import NDArray
 
-from drag_coefficient import clift_grace_weber
+from pytrebuchet.drag_coefficient import clift_grace_weber
 
 
 class Projectile:

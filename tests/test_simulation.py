@@ -3,11 +3,11 @@
 import numpy as np
 import pytest
 
-from differential_equations.sling_phase import SlingPhases
-from environment import EnvironmentConfig
-from projectile import Projectile
-from simulation import Simulation, SimulationPhases
-from trebuchet import (
+from pytrebuchet.differential_equations.sling_phase import SlingPhases
+from pytrebuchet.environment import EnvironmentConfig
+from pytrebuchet.projectile import Projectile
+from pytrebuchet.simulation import Simulation, SimulationPhases
+from pytrebuchet.trebuchet import (
     Arm,
     HingedCounterweightTrebuchet,
     Pivot,

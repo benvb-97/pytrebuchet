@@ -3,9 +3,18 @@
 import numpy as np
 import pytest
 
-from plotting.initial_position import _get_trebuchet_limits, plot_initial_position
-from projectile import Projectile
-from trebuchet import Arm, HingedCounterweightTrebuchet, Pivot, Sling, Weight
+from pytrebuchet.plotting.initial_position import (
+    _get_trebuchet_limits,
+    plot_initial_position,
+)
+from pytrebuchet.projectile import Projectile
+from pytrebuchet.trebuchet import (
+    Arm,
+    HingedCounterweightTrebuchet,
+    Pivot,
+    Sling,
+    Weight,
+)
 
 
 @pytest.fixture(scope="module")

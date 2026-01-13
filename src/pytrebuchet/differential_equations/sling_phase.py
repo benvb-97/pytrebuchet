@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy import cos, sin
+from numpy.typing import NDArray
 
 if TYPE_CHECKING:
-    from environment import EnvironmentConfig
-    from trebuchet import Trebuchet
+    from pytrebuchet.environment import EnvironmentConfig
+    from pytrebuchet.trebuchet import Trebuchet
 
 
 class SlingPhases(StrEnum):
@@ -100,7 +101,13 @@ def _get_ode_matrix(
     l3 = trebuchet.sling_projectile.length
     l4 = trebuchet.sling_weight.length
     la = trebuchet.arm.d_pivot_to_cog
+    if la is None:
+        msg = "Arm center of gravity distance 'd_pivot_to_cog' is not defined."
+        raise ValueError(msg)
     inertia_a = trebuchet.arm.inertia
+    if inertia_a is None:
+        msg = "Arm inertia is not defined."
+        raise ValueError(msg)
     m1 = trebuchet.weight.mass
     m2 = trebuchet.projectile.mass
     ma = trebuchet.arm.mass
@@ -135,7 +142,6 @@ def _get_ode_matrix(
         ]
     )
 
-    # Add constraints based on sling phase
     match sling_phase:
         case SlingPhases.UNCONSTRAINED:
             constraint_eqs_a = []
@@ -168,6 +174,28 @@ def _get_ode_matrix(
             msg = f"Unknown sling phase: {sling_phase}"
             raise ValueError(msg)
 
+    return _add_constraint_equations_to_ode_matrix(
+        A_unconstrained,
+        B_unconstrained,
+        constraint_eqs_a,
+        constraint_eqs_b,
+    )
+
+
+def _add_constraint_equations_to_ode_matrix(
+    A_unconstrained: NDArray[np.floating],  # noqa: N803
+    B_unconstrained: NDArray[np.floating],  # noqa: N803
+    constraint_eqs_a: list[NDArray[np.floating]],
+    constraint_eqs_b: list[float],
+) -> tuple[NDArray[np.floating], NDArray[np.floating]]:
+    """Add constraint equations to the unconstrained ODE matrix.
+
+    :param A_unconstrained: Unconstrained A matrix from the ODEs
+    :param B_unconstrained: Unconstrained B matrix from the ODEs
+    :param constraint_eqs_a: List of constraint equations coefficients for A matrix
+    :param constraint_eqs_b: List of constraint equations constants for B matrix
+    :return: A, B: matrices for the ODEs in the form Ax = B with constraints added
+    """
     A = np.zeros((3 + len(constraint_eqs_a), 3 + len(constraint_eqs_a)), dtype=float)  # noqa: N806
     B = np.zeros((3 + len(constraint_eqs_a)), dtype=float)  # noqa: N806
     A[:3, :3] = A_unconstrained
@@ -179,7 +207,6 @@ def _get_ode_matrix(
         A[3 + i, : len(eq_a)] = eq_a
         A[: len(eq_a), 3 + i] = eq_a
         B[3 + i] = eq_b
-
     return A, B
 
 
