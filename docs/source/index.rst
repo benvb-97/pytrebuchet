@@ -1,5 +1,5 @@
 .. pytrebuchet documentation master file, created by
-   sphinx-quickstart on Tue Jan 13 19:37:37 2026.
+   sphinx-quickstart on Wed Jan 14 21:22:58 2026.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -11,6 +11,7 @@ Add your content using ``reStructuredText`` syntax. See the
 documentation for details.
 
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. automodule:: pytrebuchet
+   :members:
+   :undoc-members:
+   :show-inheritance:
