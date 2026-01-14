@@ -439,7 +439,7 @@ class WhipperTrebuchet(Trebuchet):
     """Class representing a whipper trebuchet.
 
     A whipper trebuchet features a hinged counterweight system, but with the
-        counterweight hanger positioned at the top of the throwing arm.
+    counterweight hanger positioned at the top of the throwing arm.
     When cocked, the arm points forward in the direction of the throw.
     At the start, the weight and projectile 'rest' on the trebuchet arm.
     """
