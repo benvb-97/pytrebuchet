@@ -40,6 +40,9 @@ jobs:
           cd docs
           uv run make html
 
+      - name: Create .nojekyll file
+        run: touch docs/build/html/.nojekyll
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
