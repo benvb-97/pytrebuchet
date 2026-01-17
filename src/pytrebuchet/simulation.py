@@ -439,10 +439,10 @@ class Simulation:
 
         :param sim_phase: The simulation phase to get the state variables for.
         :param sling_phase: The sling phase to get the state variables for,
-            required if sim_phase is SLING.
+          required if sim_phase is SLING.
 
         :return: Numpy array of shape (n, 6) where n is the number of time steps,
-        containing the state variables
+          containing the state variables
         """
         # Verify correct inputs
         if sim_phase != SimulationPhases.SLING and sling_phase is not None:
@@ -498,9 +498,8 @@ class Simulation:
         :param calculate_accelerations:
             Whether to include angular accelerations in the returned array
             (default is False)
-
         :return: Numpy array of shape (n, 6) or (n, 9)
-        where n is the number of time steps, containing the state variables
+            where n is the number of time steps, containing the state variables
             [
             angle_arm,
             angle_weight,
@@ -512,6 +511,7 @@ class Simulation:
             angular_acceleration_weight (if calculate_accelerations is True),
             angular_acceleration_projectile (if calculate_accelerations is True),
             ]
+
         """
         # Fetch state variables from sling phases
         variables = []
@@ -562,9 +562,8 @@ class Simulation:
 
         :param calculate_accelerations:
             Whether to include accelerations in the returned array (default is False)
-
         :return: Numpy array of shape (n, 4) or (n, 6)
-        where n is the number of time steps, containing the state variables
+            where n is the number of time steps, containing the state variables
             [
             position_x,
             position_y,
@@ -573,6 +572,7 @@ class Simulation:
             acceleration_x (if calculate_accelerations is True),
             acceleration_y (if calculate_accelerations is True),
             ]
+
         """
         if phase not in (
             SimulationPhases.ALL,

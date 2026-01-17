@@ -375,11 +375,13 @@ class HingedCounterweightTrebuchet(Trebuchet):
         """Calculate the initial angles of the trebuchet.
 
         Calculate:
-         -angle_arm such that the projectile arm end just touches the ground.
-         If the arm is too short to reach the ground, set a default angle of 55 degrees.
-         -angle_weight such that the weight hangs vertically downwards.
-         -angle_projectile such that the projectile just touches the ground.
-         If the sling is too short to reach the ground,
+
+        - angle_arm such that the projectile arm end just touches the ground.
+          If the arm is too short to reach the ground, set a default angle of 55
+          degrees.
+        - angle_weight such that the weight hangs vertically downwards.
+        - angle_projectile such that the projectile just touches the ground.
+          If the sling is too short to reach the ground,
           set the sling angle such that it hangs vertically downwards.
         """
         # Arm angle
@@ -439,7 +441,7 @@ class WhipperTrebuchet(Trebuchet):
     """Class representing a whipper trebuchet.
 
     A whipper trebuchet features a hinged counterweight system, but with the
-        counterweight hanger positioned at the top of the throwing arm.
+    counterweight hanger positioned at the top of the throwing arm.
     When cocked, the arm points forward in the direction of the throw.
     At the start, the weight and projectile 'rest' on the trebuchet arm.
     """

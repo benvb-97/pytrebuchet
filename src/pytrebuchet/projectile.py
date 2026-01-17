@@ -31,17 +31,18 @@ class Projectile:
         It assumes a spherical shape for drag calculations.
 
         :param mass: mass of the projectile (kg). If None, mass is calculated from
-            density and diameter.
+          density and diameter.
         :param density: density of the projectile (kg/m^3). If mass is given, density
-            should be None.
+          should be None.
         :param diameter: diameter of the projectile (m)
         :param drag_coefficient: drag coefficient (dimensionless)
-            - float: constant drag coefficient
-            - callable: function that takes Reynolds number as input
-                and returns a drag coefficient. The function should be vectorized to
-                handle numpy arrays.
-            - None: use default drag coefficient function for smooth spheres calculated
-                using the Clift-Grace-Weber correlation.
+
+          - float: constant drag coefficient
+          - callable: function that takes Reynolds number as input
+            and returns a drag coefficient. The function should be vectorized to
+            handle numpy arrays.
+          - None: use default drag coefficient function for smooth spheres calculated
+            using the Clift-Grace-Weber correlation.
         """
         if mass is None:
             if density is None:
