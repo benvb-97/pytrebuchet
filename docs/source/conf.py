@@ -4,10 +4,36 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import sys
+import os
 from pathlib import Path
+from inspect import getsourcefile
 
 root_dir = Path(__file__).parents[2].resolve()
 sys.path.insert(0, str(root_dir))  # Adjust the path to include the project root
+docs_dir = Path(__file__).parent.resolve()
+
+# Get path to directory containing this file, conf.py.
+
+def ensure_pandoc_installed(_) -> None:
+    """Ensure that pandoc is installed, downloading it if necessary."""
+    import pypandoc
+
+    # Download pandoc if necessary. If pandoc is already installed and on
+    # the PATH, the installed version will be used. Otherwise, we will
+    # download a copy of pandoc into docs/bin/ and add that to our PATH.
+    pandoc_dir = docs_dir / "bin"
+    # Add dir containing pandoc binary to the PATH environment variable
+    if str(pandoc_dir) not in os.environ["PATH"].split(os.pathsep):
+        os.environ["PATH"] += os.pathsep + str(pandoc_dir)
+    pypandoc.ensure_pandoc_installed(
+        targetfolder=str(pandoc_dir),
+        delete_installer=True,
+    )
+
+
+def setup(app) -> None:
+    """Connect the ensure_pandoc_installed function to the Sphinx build process."""
+    app.connect("builder-inited", ensure_pandoc_installed)
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
