@@ -22,6 +22,7 @@ counterweight mass, sling lengths, projectile properties, and environmental cond
    :maxdepth: 2
    :caption: Table of Contents
 
+   introduction
    installation
    reference/pytrebuchet
    support_and_contact
