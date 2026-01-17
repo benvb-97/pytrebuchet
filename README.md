@@ -34,17 +34,6 @@ cd pytrebuchet
 pip install -e .
 ```
 
-## Project Structure
-
-```
-pytrebuchet/
-├── src/                # Main package code
-├── tests/              # Test suite
-├── examples/           # Example notebooks
-├── pyproject.toml      # Project configuration
-└── README.md
-```
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
