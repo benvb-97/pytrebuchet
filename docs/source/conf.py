@@ -23,10 +23,17 @@ release = "0.1.0"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",  # For Google and Numpy style docstrings
+    "nbsphinx",  # For Jupyter notebook integration
 ]
 
 templates_path = ["_templates"]
 exclude_patterns: list[str] = []
+
+# Add examples directory to source paths for nbsphinx
+nbsphinx_prolog = ""
+nbsphinx_custom_formats = {
+    ".ipynb": ["jupyter", "notebook"],
+}
 
 autodoc_default_options = {
     "members": True,
@@ -36,6 +43,16 @@ autodoc_default_options = {
     "undoc-members": True,
     "show-inheritance": True,
 }
+
+# -- nbsphinx configuration --------------------------------------------------
+# Execute notebooks before conversion (can be overridden by environment variable)
+nbsphinx_execute = "auto"  # 'auto', 'always', or 'never'
+
+# Allow errors in notebook execution (useful during development)
+nbsphinx_allow_errors = False
+
+# Timeout for each notebook cell (in seconds)
+nbsphinx_timeout = 180
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
