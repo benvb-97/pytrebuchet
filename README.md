@@ -9,6 +9,8 @@ A Python-based trebuchet simulation project.
 
 Full documentation is available at [https://benvb-97.github.io/pytrebuchet/](https://benvb-97.github.io/pytrebuchet/)
 
+![Trebuchet Launch Animation](docs/source/figures/trebuchet_launch.gif)
+
 ## Description
 
 [Pytrebuchet](https://benvb-97.github.io/pytrebuchet/) is a physics simulation tool for modeling and analyzing trebuchet mechanics. It supports multiple trebuchet types including:
