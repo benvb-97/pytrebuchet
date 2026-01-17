@@ -7,9 +7,11 @@
 
 A Python-based trebuchet simulation project.
 
+Full documentation is available at [https://benvb-97.github.io/pytrebuchet/](https://benvb-97.github.io/pytrebuchet/)
+
 ## Description
 
-Pytrebuchet is a physics simulation tool for modeling and analyzing trebuchet mechanics. It supports multiple trebuchet types including:
+[Pytrebuchet](https://benvb-97.github.io/pytrebuchet/) is a physics simulation tool for modeling and analyzing trebuchet mechanics. It supports multiple trebuchet types including:
 - **Hinged counterweight trebuchets** - traditional design with a pivoting counterweight
 - **Whipper trebuchets** - a whipper trebuchet features a hinged counterweight system, but with the counterweight hanger positioned at the top of the throwing arm
 
