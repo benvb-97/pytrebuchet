@@ -10,8 +10,8 @@ import numpy as np
 from pytrebuchet.drag_coefficient import calculate_reynolds_number
 
 if TYPE_CHECKING:
-    from environment import EnvironmentConfig
-    from projectile import Projectile
+    from pytrebuchet.environment import EnvironmentConfig
+    from pytrebuchet.projectile import Projectile
 
 
 def ballistic_ode(
