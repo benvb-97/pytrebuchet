@@ -1,5 +1,7 @@
 [![Linter](https://github.com/benvb-97/pytrebuchet/actions/workflows/linter.yml/badge.svg)](https://github.com/benvb-97/pytrebuchet/actions/workflows/linter.yml)
 [![Run Tests](https://github.com/benvb-97/pytrebuchet/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/benvb-97/pytrebuchet/actions/workflows/tests.yml)
+[![Documentation](https://github.com/benvb-97/pytrebuchet/actions/workflows/docs.yml/badge.svg?branch=main)](https://github.com/benvb-97/pytrebuchet/actions/workflows/docs.yml)
+
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/9044d19fa45840ea982c662294695d9a)](https://app.codacy.com/gh/benvb-97/pytrebuchet/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![codecov](https://codecov.io/gh/benvb-97/pytrebuchet/graph/badge.svg?token=D4L0786S9N)](https://codecov.io/gh/benvb-97/pytrebuchet)
 
@@ -7,9 +9,13 @@
 
 A Python-based trebuchet simulation project.
 
+Full documentation is available at [https://benvb-97.github.io/pytrebuchet/](https://benvb-97.github.io/pytrebuchet/)
+
+![Trebuchet Launch Animation](docs/source/figures/trebuchet_launch.gif)
+
 ## Description
 
-Pytrebuchet is a physics simulation tool for modeling and analyzing trebuchet mechanics. It supports multiple trebuchet types including:
+[Pytrebuchet](https://benvb-97.github.io/pytrebuchet/) is a physics simulation tool for modeling and analyzing trebuchet mechanics. It supports multiple trebuchet types including:
 - **Hinged counterweight trebuchets** - traditional design with a pivoting counterweight
 - **Whipper trebuchets** - a whipper trebuchet features a hinged counterweight system, but with the counterweight hanger positioned at the top of the throwing arm
 
@@ -30,24 +36,29 @@ cd pytrebuchet
 ```
 
 2. Install the package:
+
+**Using pip:**
 ```bash
+# Basic installation
 pip install -e .
+
+# With development dependencies
+pip install -e ".[dev]"
 ```
 
-## Project Structure
+**Using uv:**
+```bash
+# Basic installation
+uv pip install -e .
 
-```
-pytrebuchet/
-├── src/                # Main package code
-├── tests/              # Test suite
-├── examples/           # Example notebooks
-├── pyproject.toml      # Project configuration
-└── README.md
+# With development dependencies
+uv sync --group dev
 ```
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for a detailed guide.
 
 ## References
 
@@ -56,4 +67,4 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## License
 
-Pytrebuchet is provided under an MIT license that can be found in the LICENSE file.
+Pytrebuchet is provided under an MIT license that can be found in the [LICENSE](LICENSE) file.
