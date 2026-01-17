@@ -29,12 +29,6 @@ extensions = [
 templates_path = ["_templates"]
 exclude_patterns: list[str] = []
 
-# Add examples directory to source paths for nbsphinx
-nbsphinx_prolog = ""
-nbsphinx_custom_formats = {
-    ".ipynb": ["jupyter", "notebook"],
-}
-
 autodoc_default_options = {
     "members": True,
     "member-order": "bysource",
