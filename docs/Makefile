@@ -12,7 +12,21 @@ BUILDDIR      = build
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help Makefile
+# Tell Makefile that these targets are not files.
+.PHONY: help Makefile apidoc
+
+# Generate API documentation from Python source code
+# -f: force overwrite
+# -e: put each module file in its own page (no single big file)
+# -M: put module documentation before submodule documentation
+# -o: output directory (source/reference)
+apidoc:
+	sphinx-apidoc -f -e -M -o source/reference ../src/pytrebuchet
+
+# Build HTML documentation
+# Overrides the default target to run apidoc first
+html: apidoc
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
