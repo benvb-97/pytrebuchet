@@ -2,7 +2,7 @@ Examples
 ========
 This section contains example Jupyter notebooks demonstrating various features and use cases of pytrebuchet.
 
-General Examples
+General
 ----------------
 
 .. toctree::
