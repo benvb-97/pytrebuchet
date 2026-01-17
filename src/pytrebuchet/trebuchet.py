@@ -375,11 +375,13 @@ class HingedCounterweightTrebuchet(Trebuchet):
         """Calculate the initial angles of the trebuchet.
 
         Calculate:
-         -angle_arm such that the projectile arm end just touches the ground.
-         If the arm is too short to reach the ground, set a default angle of 55 degrees.
-         -angle_weight such that the weight hangs vertically downwards.
-         -angle_projectile such that the projectile just touches the ground.
-         If the sling is too short to reach the ground,
+
+        - angle_arm such that the projectile arm end just touches the ground.
+          If the arm is too short to reach the ground, set a default angle of 55
+          degrees.
+        - angle_weight such that the weight hangs vertically downwards.
+        - angle_projectile such that the projectile just touches the ground.
+          If the sling is too short to reach the ground,
           set the sling angle such that it hangs vertically downwards.
         """
         # Arm angle

@@ -439,10 +439,10 @@ class Simulation:
 
         :param sim_phase: The simulation phase to get the state variables for.
         :param sling_phase: The sling phase to get the state variables for,
-            required if sim_phase is SLING.
+          required if sim_phase is SLING.
 
         :return: Numpy array of shape (n, 6) where n is the number of time steps,
-        containing the state variables
+          containing the state variables
         """
         # Verify correct inputs
         if sim_phase != SimulationPhases.SLING and sling_phase is not None:

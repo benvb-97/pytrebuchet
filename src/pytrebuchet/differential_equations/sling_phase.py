@@ -55,9 +55,10 @@ def sling_ode(
     :param trebuchet: Trebuchet object containing trebuchet parameters
     :param environment: EnvironmentConfig object containing environmental parameters
     :param sling_phase: current phase of the sling (from SlingPhases enum)
-        This determines the additional constraints to apply to the ODEs.
+      This determines the additional constraints to apply to the ODEs.
+
     :return: derivatives: tuple containing the derivatives of the state variables:
-    (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
+      (dtheta, dphi, dpsi, ddtheta, ddphi, ddpsi)
     """
     _ = t  # time variable not used
     dtheta, dphi, dpsi = y[3], y[4], y[5]
@@ -235,10 +236,10 @@ def sling_terminate_event(
     :param trebuchet: Trebuchet object containing trebuchet parameters
     :param environment: EnvironmentConfig object containing environmental parameters
     :param sling_phase: current phase of the sling (from SlingPhases enum)
-        This parameter is used to determine the correct event function.
+      This parameter is used to determine the correct event function.
 
     :return: event_value: difference between the current velocity angle and the desired
-    release angle
+      release angle
     """
     _ = t  # time variable not used
 
@@ -278,7 +279,7 @@ def _release_projectile_event(
     :param environment: EnvironmentConfig object containing environmental parameters
 
     :return: event_value: difference between the current velocity angle and the desired
-    release angle
+      release angle
     """
     # theta_arm, theta_weight, theta_sling, dtheta_arm, dtheta_weight, dtheta_sling
     theta, _, psi, dtheta, _, dpsi = y
@@ -356,7 +357,7 @@ def _projectile_separates_from_arm_event(
     :param environment: EnvironmentConfig object containing environmental parameters
 
     :return: lambd: the lagrange multiplier, representing the normal force at the ground
-    contact point.
+      contact point.
     """
     A, B = _get_ode_matrix(  # noqa: N806
         y,
@@ -394,7 +395,7 @@ def _weight_separates_from_arm_event(
     :param environment: EnvironmentConfig object containing environmental parameters
 
     :return: lambd: the lagrange multiplier, representing the normal force at the
-    ground contact point.
+      ground contact point.
     """
     A, B = _get_ode_matrix(  # noqa: N806
         y,
