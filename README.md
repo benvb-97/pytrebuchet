@@ -56,4 +56,4 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## License
 
-Pytrebuchet is provided under an MIT license that can be found in the LICENSE file.
+Pytrebuchet is provided under an MIT license that can be found in the [LICENSE](LICENSE) file.
