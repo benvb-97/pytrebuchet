@@ -48,6 +48,7 @@ pytrebuchet/
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for a detailed guide.
 
 ## References
 
