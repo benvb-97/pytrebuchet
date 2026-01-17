@@ -24,6 +24,7 @@ counterweight mass, sling lengths, projectile properties, and environmental cond
 
    introduction
    installation
+   examples
    reference/pytrebuchet
    support_and_contact
    contributing
