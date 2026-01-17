@@ -36,8 +36,23 @@ cd pytrebuchet
 ```
 
 2. Install the package:
+
+**Using pip:**
 ```bash
+# Basic installation
 pip install -e .
+
+# With development dependencies
+pip install -e ".[dev]"
+```
+
+**Using uv:**
+```bash
+# Basic installation
+uv pip install -e .
+
+# With development dependencies
+uv sync --group dev
 ```
 
 ## Contributing
