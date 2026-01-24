@@ -6,6 +6,7 @@ workspace area.
 
 from PySide6.QtWidgets import QMainWindow
 
+from pytrebuchet.ui.models.session import SessionModel
 from pytrebuchet.ui.widgets.main_menu import MainMenuBar
 
 
@@ -38,6 +39,7 @@ class MainWindow(QMainWindow):
 
     def _setup_models(self) -> None:
         """Set up the data models for the main window components."""
+        self._session_model = SessionModel()
 
     def _setup_connections(self) -> None:
         """Set up the signal-slot connections for the main window."""
