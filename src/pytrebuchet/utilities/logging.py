@@ -77,7 +77,7 @@ LOGGING_CONFIG = {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "standard",
             "level": "DEBUG",
-            "filename": f"{ROOT_DIR}/log.txt",
+            "filename": f"{ROOT_DIR}/pytrebuchet.log",
             "mode": "a",
             "encoding": "utf-8",
             "backupCount": 4,
