@@ -6,6 +6,7 @@
 coverage.*
 __pycache__/
 uv.lock
+*.log
 src/pytrebuchet.egg-info/*
 docs/build/*
 docs/source/reference/*
