@@ -4,10 +4,11 @@ It sets up the main UI components including the menu bar, side bar, and
 workspace area.
 """
 
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QSplitter, QWidget
 
 from pytrebuchet.ui.models.session import SessionModel
 from pytrebuchet.ui.widgets.main_menu import MainMenuBar
+from pytrebuchet.ui.widgets.side_bar import SideBar
 
 
 class MainWindow(QMainWindow):
@@ -35,11 +36,22 @@ class MainWindow(QMainWindow):
         self._menu_bar = MainMenuBar(parent=self)
         self.setMenuBar(self._menu_bar)
 
+        # Create the main splitter to hold side bar and workspace
+        self._splitter = QSplitter(self)
+        self.setCentralWidget(self._splitter)
+
+        # Add side bar and workspace area to the splitter
+        self._side_bar = SideBar(parent=self)
+        self._splitter.addWidget(self._side_bar)
+        self._splitter.addWidget(QWidget(self))  # Placeholder for workspace area
+
         self.showMaximized()
 
     def _setup_models(self) -> None:
         """Set up the data models for the main window components."""
         self._session_model = SessionModel()
+
+        self._side_bar.set_session_model(self._session_model)
 
     def _setup_connections(self) -> None:
         """Set up the signal-slot connections for the main window."""
