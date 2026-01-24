@@ -44,6 +44,9 @@ dev = [
     "sphinx-rtd-theme>=3.1.0",
     "pypandoc>=1.16.2",
 ]
+ui = [
+    "pyside6>=6.10.1",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
