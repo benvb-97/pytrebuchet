@@ -6,6 +6,8 @@ workspace area.
 
 from PySide6.QtWidgets import QMainWindow
 
+from pytrebuchet.ui.widgets.main_menu import MainMenuBar
+
 
 class MainWindow(QMainWindow):
     """Main window class for the PyTrebuchet application.
@@ -28,6 +30,9 @@ class MainWindow(QMainWindow):
     def _setup_ui(self) -> None:
         """Set up the main UI components of the main window."""
         self.setWindowTitle("PyTrebuchet User Interface")
+
+        self._menu_bar = MainMenuBar(parent=self)
+        self.setMenuBar(self._menu_bar)
 
         self.showMaximized()
 
