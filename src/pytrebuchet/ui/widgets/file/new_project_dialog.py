@@ -60,6 +60,11 @@ class NewProjectDialog(QDialog):
         filename_layout.addWidget(self._filename_line_edit)
         filename_layout.addWidget(self._filename_button)
 
+        # Add label for warning messages
+        self._warning_label = QLabel(parent=self)
+        self._warning_label.setVisible(False)
+        self._layout.addWidget(self._warning_label)
+
         # Add button box for Create/Cancel project actions
         self._button_box = QDialogButtonBox(Qt.Orientation.Horizontal)
         self._layout.addWidget(self._button_box)
@@ -83,7 +88,16 @@ class NewProjectDialog(QDialog):
 
     def _create_new_project(self) -> None:
         """Create a new project with the selected filename. Close the dialog."""
-        raise NotImplementedError
+        filename = self._filename_line_edit.text()
+        if Path(filename).is_file():
+            self.create_new_project.emit(filename)
+            self.accept()
+        else:
+            # Show temporary error message below the line edit
+            self._warning_label.setText(
+                self.tr("Please select a valid project filename.")
+            )
+            self._warning_label.setVisible(True)
 
     def _open_filename_dialog(self) -> None:
         """Open a file dialog to select a project."""

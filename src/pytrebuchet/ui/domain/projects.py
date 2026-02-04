@@ -37,3 +37,18 @@ class ProjectCollection:
     def __len__(self) -> int:
         """Return the number of projects in the collection."""
         return len(self._projects)
+
+    def create_project(self, filename: PathLike) -> Project:
+        """Create a new project and add it to the collection.
+
+        Args:
+            filename (PathLike): Path to the new project file.
+
+        Returns:
+            Project: The newly created Project instance.
+
+        """
+        new_id = max(self._projects.keys(), default=0) + 1
+        new_project = Project(identifier=new_id, filename=filename)
+        self._projects[new_id] = new_project
+        return new_project

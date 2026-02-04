@@ -1,6 +1,8 @@
 """Qt model for project collections in the pytrebuchet application."""
 
-from PySide6.QtCore import QAbstractListModel, Qt
+from pathlib import Path
+
+from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt
 
 from pytrebuchet.ui.domain.projects import ProjectCollection
 from pytrebuchet.ui.qt_type_hints import QtModelIndex
@@ -33,3 +35,14 @@ class ProjectCollectionModel(QAbstractListModel):
     ) -> str | None:
         """Return the data for a given index and role."""
         return None
+
+    def create_project(self, filename: Path) -> None:
+        """Create a new project in the collection.
+
+        Args:
+            filename (Path): The filename of the new project to create.
+
+        """
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self._project_collection.create_project(filename)
+        self.endInsertRows()
