@@ -4,6 +4,7 @@
 *.py[cod]
 .coverage
 coverage.*
+.nicegui/*
 __pycache__/
 uv.lock
 src/pytrebuchet.egg-info/*
