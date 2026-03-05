@@ -1,6 +1,7 @@
 """Main module for the NiceGUI application.
 
-When executed, this module starts a NiceGUI web application at the root path.
+When executed, this module starts a NiceGUI application. Pass --native to open
+a native OS desktop window instead of launching a browser tab.
 """
 
 import os
@@ -67,4 +68,8 @@ def root() -> None:
 
 if __name__ in {"__main__", "__mp_main__"}:
     storage_secret = os.environ.get("NICEGUI_STORAGE_SECRET", "")
-    ui.run(storage_secret=storage_secret)
+    ui.run(
+        native=True,
+        reload=False,
+        storage_secret=storage_secret,
+    )
