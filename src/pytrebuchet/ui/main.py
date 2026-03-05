@@ -8,7 +8,7 @@ import os
 
 from nicegui import app, ui
 
-from pytrebuchet.ui.units import length_unit_labels, mass_unit_labels
+from pytrebuchet.ui.unit_labels import length_unit_labels, mass_unit_labels
 from pytrebuchet.units import LengthUnit, MassUnit
 
 
@@ -39,8 +39,7 @@ class UnitSelector:
             mass_select = ui.select(
                 label="Mass Unit",
                 options={
-                    unit: f"{label.verbose} ({label.symbol})"
-                    for unit, label in mass_unit_labels.items()
+                    unit: label.display for unit, label in mass_unit_labels.items()
                 },
                 value=self.storage.get("mass_unit"),
             )
@@ -50,8 +49,7 @@ class UnitSelector:
             length_select = ui.select(
                 label="Length Unit",
                 options={
-                    unit: f"{label.verbose} ({label.symbol})"
-                    for unit, label in length_unit_labels.items()
+                    unit: label.display for unit, label in length_unit_labels.items()
                 },
                 value=self.storage.get("length_unit"),
             )
@@ -70,6 +68,6 @@ if __name__ in {"__main__", "__mp_main__"}:
     storage_secret = os.environ.get("NICEGUI_STORAGE_SECRET", "")
     ui.run(
         native=True,
-        reload=False,
+        reload=True,
         storage_secret=storage_secret,
     )
